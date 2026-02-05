@@ -21,7 +21,10 @@ const numeros = [1, 2, 3, 4, 5]
 //     <p>Quinto elemento: ${numeros[4]}</p>
 //     `
 
-numeros.forEach((numeros) => console.log(numeros))
+numeros.forEach((numeros) => exemploArrayAcessoDiv.innerHTML += `
+   <p>${numeros}</p> 
+`
+)
 
 
 
