@@ -4,3 +4,4 @@ let idade = prompt("Digite sua idade:");
 console.log(
   "Seu nome é " + nome + " " + sobrenome + " e a sua idade é " + idade + ".",
 );
+
