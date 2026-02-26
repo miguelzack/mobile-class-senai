@@ -6,18 +6,42 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Cadastro Produto</title>
-  <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 <div id="container">
-  <h1>Cadastro de Produtos</h1>
-  <form action="" id="produtoForm">
-    <label for="nome">Nome:</label>
-    <input type="text" name="nome" id="nome" required>
+    <h1>Cadastro de Produtos</h1>
+    <form action="" id="produtoForm">
+        <label for="nome">Nome:</label>
+        <input type="text" name="nome" id="nome" required>
 
-    <label for="preco">Nome:</label>
-    <input type="number" name="preco" id="preco" step="0.10" required>
-  </form>
+        <label for="preco">Preço:</label>
+        <input type="number" name="preco" id="preco" step="0.10" required>
+
+        <label for="disponibilidade">Disponibilidade</label>
+        <select name="disponibilidade" id="disponibilidade">
+            <option value="Disponivel">Disponível</option>
+            <option value="Indiponivel">Indisponível</option>
+        </select> <br> <br>
+
+        <input type="hidden" id="produtoId">
+        <button type="submit">Salvar</button>
+        <button type="button" id="cancelar">Cancelar</button>
+    </form>
+    <h2>Lista de Produtos</h2>
+    <table id="produtotable">
+        <thead>
+        <tr>
+            <th>Nome</th>
+            <th>Preço</th>
+            <th>Disponibilidade</th>
+            <th>Ações</th>
+        </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+    </table>
 </div>
 
 <script src="js/index.js"></script>
