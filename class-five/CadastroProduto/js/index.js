@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const produtoFormElement = document.getElementById("produtoForm")
     const produtotableELement = document.getElementById("produtotable")
-    getElementsByTagName('tbody')[0]
+    const tbody = document.getElementsByTagName('tbody')[0]
     const produtoIdElement = document.getElementById("produtoId")
     const cancelarBtnElement = document.getElementById("cancelar")
 
@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', function () {
         return produtos ? JSON.parse(produtos) : []
     }
 
-    function salvarProduto() {
+    function salvarProduto(produtos) {
         localStorage.setItem("produtos", JSON.stringify(produtos))
     }
 
@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             const disponibilidadeCell = row.insertCell()
             disponibilidadeCell.textContent = produto.disponibilidade
-            disponibilidadeCell.ClassLis.add(produto.disponibilidade === "Disponivel" ? 'disponivel' : 'indiponivel')
+            disponibilidadeCell.classList.add(produto.disponibilidade === "Disponivel" ? 'disponivel' : 'indisponivel')
 
             const actionCell = row.insertCell()
             const editarBtn = document.createElement("button")
@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const produtoId = produtoIdElement.value
 
 
-        if (nome && !isNan(preco)) {
+        if (nome && !isNaN(preco)) {
             const produtos = getProdutos()
 
             if (editing) {
@@ -79,4 +79,19 @@ document.addEventListener('DOMContentLoaded', function () {
             alert("Por favor, preencha o nome e o preço corretamente!")
         }
     })
+    
+    function editarProduto(index) {
+        editing = true
+        const produtos = getProdutos()
+        const produto = produtos[index]
+        document.getElementById('nome').value = produto.nome
+        document.getElementById("preco").value = produto.preco
+        document.getElementById("disponibilidade").value = produto.disponibilidade
+        produtoIdElement.value = index
+
+        cancelarBtnElement.style.display = 'inline-block'
+    }
+
+
 })
+
