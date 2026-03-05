@@ -19,14 +19,14 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function exibirProduto() {
-        produtotableELement.innerHTML = ""
+        tbody.innerHTML = ""
 
         const produtos = getProdutos()
 
         for (let i = 0; i < produtos.length; i++) {
             const produto = produtos[i]
 
-            const row = produtotableELement.insertRow()
+            const row = tbody.insertRow()
 
             const nomeCell = row.insertCell()
             nomeCell.textContent = produto.nome
@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', function () {
             alert("Por favor, preencha o nome e o preço corretamente!")
         }
     })
-    
+
     function editarProduto(index) {
         editing = true
         const produtos = getProdutos()
@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function excluirProduto(index) {
-        if(confirm("Tem certeza que deseja excluir esse produto?")) {
+        if (confirm("Tem certeza que deseja excluir esse produto?")) {
             const produtos = getProdutos();
             produtos.splice(index, 1)
             salvarProduto(produtos)
@@ -107,5 +107,7 @@ document.addEventListener('DOMContentLoaded', function () {
         produtoIdElement.value = "";
         cancelarBtnElement.style.display = "none"
     })
+
+    exibirProduto()
 })
 

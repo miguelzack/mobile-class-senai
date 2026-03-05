@@ -5,13 +5,13 @@ body {
     padding: 0;
 }
 
-.container {
+#container {
     width: 40vw;
     margin: 20px auto;
     background-color: #dad9d9;
     padding: 20px;
     border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
 }
 
 h1, h2 {
@@ -33,7 +33,7 @@ select {
     margin-bottom: 15px;
     border: 1px solid #ccc;
     border-radius: 4px;
-    box-sizing: border-box; /* Garante que o padding não aumente o tamanho total */
+    box-sizing: border-box;
 }
 
 button {
@@ -64,13 +64,14 @@ th, td {
 
 th {
     background-color: #f2f2f2;
-    font-weight: bold;
 }
 
 .disponivel {
     color: green;
+    font-weight: bold;
 }
 
 .indisponivel {
     color: red;
+    font-weight: bold;
 }
