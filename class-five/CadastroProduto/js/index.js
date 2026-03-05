@@ -101,5 +101,11 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    cancelarBtnElement.addEventListener("click", function () {
+        editing = false
+        produtoFormElement.reset()
+        produtoIdElement.value = "";
+        cancelarBtnElement.style.display = "none"
+    })
 })
 
