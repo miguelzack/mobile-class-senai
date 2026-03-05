@@ -92,6 +92,12 @@ document.addEventListener('DOMContentLoaded', function () {
         cancelarBtnElement.style.display = 'inline-block'
     }
 
+    function excluirProduto(index) {
+        if(confirm("Tem certeza que deseja excluir esse produto?")) {
+            const produtos = getProdutos();
+            produtos.splice(index, 1)
+        }
+    }
 
 })
 
