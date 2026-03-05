@@ -96,6 +96,8 @@ document.addEventListener('DOMContentLoaded', function () {
         if(confirm("Tem certeza que deseja excluir esse produto?")) {
             const produtos = getProdutos();
             produtos.splice(index, 1)
+            salvarProduto(produtos)
+            exibirProduto()
         }
     }
 
