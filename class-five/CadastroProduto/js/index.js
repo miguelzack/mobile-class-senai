@@ -2,7 +2,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
     const produtoFormElement = document.getElementById("produtoForm")
-    const produtotableELement = document.getElementById("produtotable")
     const tbody = document.getElementsByTagName('tbody')[0]
     const produtoIdElement = document.getElementById("produtoId")
     const cancelarBtnElement = document.getElementById("cancelar")
