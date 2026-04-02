@@ -32,7 +32,7 @@ export default function TaskCard({item, onDelete, onEdit}) {
                         ✏️
                     </Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={onEdit}>
+                <TouchableOpacity onPress={onDelete}>
                     <Text style={styles.icon}>
                         🗑️
                     </Text>
