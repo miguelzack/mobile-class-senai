@@ -21,7 +21,7 @@ export default function EditTask ({ visible, taskData, onSave, onClose }) {
 
                 <TextInput value={currentTask?.title} 
                            style={styles.input}
-                           onChangeText={t => setCurrentTask({...curentTask, title: t})}
+                           onChangeText={t => setCurrentTask({...currentTask, title: t})}
                 />
 
                 <TextInput value={currentTask?.description}
