@@ -4,3 +4,4 @@
 [submodule "consume-brasil-api-mobile"]
 	path = consume-brasil-api-mobile
 	url = https://github.com/miguelzack/consume-brasil-api-mobile.git
+	branch = develop
