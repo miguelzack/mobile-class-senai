@@ -1,3 +1,6 @@
 [submodule "consume-brasil-api"]
 	path = consume-brasil-api
 	url = https://github.com/miguelzack/consume-brasil-api.git
+[submodule "consume-brasil-api-mobile"]
+	path = consume-brasil-api-mobile
+	url = https://github.com/miguelzack/consume-brasil-api-mobile.git
