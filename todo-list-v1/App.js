@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import { theme } from './src/styles/global';
 
-// IMPORTAÇÃO DOS COMPONENTES
+
 import SearchBar from './src/components/SearchBar';
 import TaskCard from './src/components/TaskCard';
 import AddTask from './src/components/AddTask';
@@ -15,7 +15,6 @@ export default function App() {
   const [editVisible, setEditVisible]   = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
 
-  // FUNÇÕES DE LÓGICA
   const addTask = (newTask) => {
     setTasks([...tasks, { ...newTask, id: Date.now().toString() }]);
     setAddVisible(false);
@@ -33,12 +32,12 @@ export default function App() {
     setEditVisible(true);
   };
 
-  // Filtro de Pesquisa
+
   const filteredTasks = tasks.filter(t => t.title.toLowerCase().includes(searchText.toLowerCase()));
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>🚀 Aula Todo List</Text>
+      <Text style={styles.header}>Aula Todo List</Text>
       
       <SearchBar value={searchText} onChangeText={setSearchText} />
 
@@ -54,7 +53,6 @@ export default function App() {
         <Text style={{color: '#FFF', fontSize: 30}}>+</Text>
       </TouchableOpacity>
 
-      {/* Modais de Funcionalidade */}
       <AddTask  visible={addVisible}  onSave={addTask} onClose={() => setAddVisible(false)} />
       <EditTask visible={editVisible} taskData={selectedTask} onSave={updateTask} onClose={() => setEditVisible(false)} />
     </View>
