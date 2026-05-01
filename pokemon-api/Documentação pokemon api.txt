@@ -1,0 +1,67 @@
+Documentação pokemon-api
+
+Requisitos Funcionais (RF)
+
+RF01: O sistema deve permitir a visualização de uma lista de pokémons provenientes de uma API externa.
+
+RF02: O sistema deve permitir a busca de pokémons por nome.
+
+RF03: O sistema deve permitir a navegação entre telas e/ou componentes da aplicação.
+
+RF04: O sistema deve exibir informações básicas dos pokémons, como imagem e tipo.
+
+RF05: O sistema deve permitir a filtragem de pokémons por geração (ex: Gen 1, Gen 2, etc.).
+
+RF06: O sistema deve permitir a filtragem de pokémons por tipo (ex: água, voador, etc.).
+
+RF07: O sistema deve permitir visualizar todos os pokémons sem a aplicação de filtros.
+
+RF08: O sistema deve permitir a busca de pokémons considerando os filtros ativos, retornando apenas resultados que correspondam simultaneamente ao termo pesquisado e aos filtros aplicados.
+
+
+
+
+Requisitos Não Funcionais (RNF)
+
+Agora aqui é onde muita gente perde ponto — então já vou te entregar bem completo e alinhado com o que o professor pediu:
+
+RNF01: A aplicação deve ser desenvolvida utilizando React Native com Expo.
+
+RNF02: O consumo da API deve ser realizado utilizando a biblioteca Axios.
+
+RNF03: A aplicação deve apresentar feedback visual durante o carregamento dos dados, utilizando um indicador de carregamento (ActivityIndicator).
+
+RNF04: A aplicação deve tratar erros de requisição à API, exibindo mensagens apropriadas ao usuário em caso de falha de conexão ou erro na resposta.
+
+RNF05: A aplicação deve possuir uma arquitetura de pastas modular, separando componentes, telas, serviços, estilos e rotas para facilitar a manutenção do código.
+
+RNF06: A interface deve ser responsiva e adaptável a diferentes tamanhos de tela.
+
+RNF07: A aplicação deve utilizar componentes otimizados para listas, como o FlatList, garantindo melhor performance na renderização.
+
+RNF08: A aplicação deve utilizar navegação estruturada através do React Navigation.
+
+RNF09: O código deve ser organizado, indentado e sem erros no console durante a execução.
+
+RNF10: A aplicação deve garantir que o conteúdo respeite áreas seguras da tela, utilizando SafeAreaView ou abordagem equivalente.
+
+
+
+
+
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Pendências:
+
+Produzir global com as cores e as fontes
+Definir os componentes, criar as pastas deles
+
+
+Estruturar as pastas
+
+Começar pelo App.jsx e componentes, dps pensar no js e tralala
+
+
+
+Fazer o submodule do github no final
