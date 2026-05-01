@@ -64,4 +64,4 @@ Começar pelo App.jsx e componentes, dps pensar no js e tralala
 
 
 
-Fazer o submodule do github no final
+Fazer o submodule do github no final	
