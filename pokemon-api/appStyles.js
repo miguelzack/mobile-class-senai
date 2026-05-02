@@ -1,4 +1,4 @@
-import {StyleSheet} from 'react-native';
+import {StatusBar, StyleSheet} from 'react-native';
 import {FONTS, COLORS} from './src/styles/global';
 
 export const styles = StyleSheet.create({
@@ -10,6 +10,7 @@ export const styles = StyleSheet.create({
         paddingVertical: 10,
         paddingHorizontal: 20,
         flexDirection: "row",
+        paddingTop: StatusBar.currentHeight || 0,
     }, linkHeader: {
         flexDirection: "row", alignItems: "center", justifyContent: "center",
     }, textLinkHeader: {

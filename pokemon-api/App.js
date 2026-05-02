@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-    View, Text, TouchableOpacity, Linking, Image, FlatList
+    View, Text, TouchableOpacity, Linking, Image, FlatList, SafeAreaView, StatusBar
 } from 'react-native';
 
 import {styles} from "./appStyles";
@@ -22,7 +22,9 @@ export default function App() {
 
     const DATA = [{id: "screen"}];
 
-    const renderScreen = () => (<>
+    const renderScreen = () => (<SafeAreaView style={{flex: 1, backgroundColor: "#000"}}>
+
+        <StatusBar barStyle="light-content" backgroundColor="#000"/>
         <View style={styles.header}>
             <TouchableOpacity
                 style={styles.linkHeader}
@@ -35,41 +37,49 @@ export default function App() {
             </TouchableOpacity>
         </View>
 
-        <LinearGradient
-            colors={["#000", "#bb0d0d"]}
-            style={styles.main}
-        >
-            <View style={styles.contentMain}>
-                <Image
-                    resizeMode="contain"
-                    style={styles.imageMain}
-                    source={require('./src/assets/images/pokedexFont.png')}
-                />
+        <FlatList
+            data={[{key: "content"}]}
+            keyExtractor={(item) => item.key}
+            showsVerticalScrollIndicator={false}
+            renderItem={() => (<>
+                <LinearGradient
+                    colors={["#000", "#bb0d0d"]}
+                    style={styles.main}
+                >
+                    <View style={styles.contentMain}>
+                        <Image
+                            resizeMode="contain"
+                            style={styles.imageMain}
+                            source={require('./src/assets/images/pokedexFont.png')}
+                        />
 
-                <Text style={styles.titleMain}>
-                    Bem-vindos ao{" "}
-                    <Text style={styles.titleSpanMain}>
-                        consumo de API
-                    </Text>{" "}
-                    de Pokémon
-                </Text>
+                        <Text style={styles.titleMain}>
+                            Bem-vindos ao{" "}
+                            <Text style={styles.titleSpanMain}>
+                                consumo de API
+                            </Text>{" "}
+                            de Pokémon
+                        </Text>
 
-                <Text style={styles.textMain}>
-                    Explore todos os Pokémon por geração, tipo ou busca.
-                </Text>
+                        <Text style={styles.textMain}>
+                            Explore todos os Pokémon por geração, tipo ou busca.
+                        </Text>
 
-                <ActionButtons/>
-            </View>
-        </LinearGradient>
+                        <ActionButtons/>
+                    </View>
+                </LinearGradient>
 
-        <View style={styles.sectionViewCards}>
-            <Text style={styles.textSectionView}>
-                Veja os <Text style={styles.textSectionSpan}>Pokémon</Text>
-            </Text>
-        </View>
+                <View style={styles.sectionViewCards}>
+                    <Text style={styles.textSectionView}>
+                        Veja os <Text style={styles.textSectionSpan}>Pokémon</Text>
+                    </Text>
+                </View>
 
-        <CardAll/>
-    </>);
+                <CardAll/>
+            </>)}
+        />
+
+    </SafeAreaView>);
 
     return (<FlatList
         data={DATA}

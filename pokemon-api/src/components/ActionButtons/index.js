@@ -12,12 +12,8 @@ export default function ActionButtons() {
     };
 
     return (<View style={styles.buttonWrapper}>
-        <TouchableOpacity style={styles.btnPrimary} onPress={goToSection}>
-            <Text style={styles.btnTextPrimary}>Veja agora</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.btnSecondary} onPress={openPokeAPI}>
-            <Text style={styles.btnTextSecondary}>Saiba mais</Text>
+        <TouchableOpacity style={styles.btnPrimary} onPress={openPokeAPI}>
+            <Text style={styles.btnTextPrimary}>Saiba mais</Text>
         </TouchableOpacity>
     </View>);
 }
