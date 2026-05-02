@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "pokemon-api",
-    "slug": "pokemon-api",
+    "name": "Pokédex - Pokémon",
+    "slug": "pokedex-pokemon",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -12,10 +12,15 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.miguel.pokedexpokemon"
     },
     "android": {
+      "package": "com.miguel.pokedexpokemon",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -27,6 +32,9 @@
     },
     "plugins": [
       "expo-font"
-    ]
+    ],
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    }
   }
 }

@@ -16,6 +16,7 @@ export const COLORS = {
     text: '#FFFFFF',
     textDark: '#000000',
     danger: '#AA0000',
+    redSecondary: '#4e0e0e'
 };
 
 export const FONTS = {
