@@ -14,24 +14,18 @@ export const CardAll = () => {
         const fetchTypes = async () => {
             try {
                 const res = await api.get("type");
-
                 const responses = await Promise.all(res.data.results.map((t) => api.get(t.url)));
-
                 const icons = {};
-
                 responses.forEach((res) => {
                     const typeName = res.data.name;
                     const icon = res.data.sprites?.["generation-viii"]?.["sword-shield"]?.name_icon;
-
                     icons[typeName] = icon;
                 });
-
                 setTypeIcons(icons);
             } catch (err) {
                 console.log(err);
             }
         };
-
         fetchTypes();
     }, []);
 
@@ -39,9 +33,7 @@ export const CardAll = () => {
         const fetchList = async () => {
             try {
                 setLoading(true);
-
                 const res = await api.get(`pokemon?limit=20&offset=${offset}`);
-
                 setPoke((prev) => [...prev, ...res.data.results]);
             } catch (err) {
                 console.log(err);
@@ -49,7 +41,6 @@ export const CardAll = () => {
                 setLoading(false);
             }
         };
-
         fetchList();
     }, [offset]);
 
@@ -58,11 +49,8 @@ export const CardAll = () => {
             try {
                 const newPokes = poke.slice(dataPoke.length);
                 if (newPokes.length === 0) return;
-
                 const responses = await Promise.all(newPokes.map((p) => api.get(p.url)));
-
                 const data = responses.map((res) => res.data);
-
                 setDataPoke((prev) => {
                     const ids = new Set(prev.map((p) => p.id));
                     const filtered = data.filter((p) => !ids.has(p.id));
@@ -72,12 +60,18 @@ export const CardAll = () => {
                 console.log(err);
             }
         };
-
         fetchDetails();
     }, [poke]);
 
     const loadMore = () => {
         if (!loading) setOffset((prev) => prev + 20);
+    };
+
+    const renderFooter = () => {
+        if (!loading) return null;
+        return (<View style={styles.footerLoader}>
+            <ActivityIndicator size="large" color="red"/>
+        </View>);
     };
 
     const renderItem = ({item}) => (<View style={styles.card}>
@@ -87,15 +81,12 @@ export const CardAll = () => {
                 uri: item.sprites?.other?.["official-artwork"]?.front_default || item.sprites?.front_default
             }}
         />
-
         <Text numberOfLines={1} style={styles.name}>
             {item.name}
         </Text>
-
         <Text style={styles.id}>
             #{String(item.id).padStart(3, "0")}
         </Text>
-
         <View style={styles.types}>
             {item.types.map((t) => (<Image
                 key={t.type.name}
@@ -110,17 +101,11 @@ export const CardAll = () => {
             data={dataPoke}
             keyExtractor={(item) => item.id.toString()}
             renderItem={renderItem}
-
-            numColumns={1}
-
+            numColumns={2}
             contentContainerStyle={styles.list}
-
             onEndReached={loadMore}
             onEndReachedThreshold={0.5}
+            ListFooterComponent={renderFooter}
         />
-
-        {loading && (<View style={styles.loadingOverlay}>
-            <ActivityIndicator size="large" color="red"/>
-        </View>)}
     </View>);
 };
