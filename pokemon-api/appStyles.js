@@ -47,6 +47,26 @@ export const styles = StyleSheet.create({
         textAlign: "center"
     }, textSectionSpan: {
         color: COLORS.accent
-    }
+    }, fab: {
+        position: 'absolute',
+        bottom: 60,
+        right: 20,
+        backgroundColor: COLORS.accent,
+        width: 60,
+        height: 60,
+        borderRadius: 50,
+        justifyContent: 'center',
+        alignItems: 'center',
+        elevation: 8,
+        zIndex: 9999,
+        shadowColor: COLORS.textDark,
+        shadowOffset: {width: 0, height: 3},
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        borderWidth: 4,
+        borderColor: COLORS.textDark,
+    }, fabText: {
+        fontSize: 36, fontWeight: '800', color: COLORS.textDark, lineHeight: 36, transform: [{translateY: -2}],
+    },
 
 });

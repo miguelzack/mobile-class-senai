@@ -1,15 +1,25 @@
-import React, {useEffect, useState} from "react";
-import {View, Text, Image, FlatList, ActivityIndicator} from "react-native";
+// CardAll.js
+import React, { useEffect, useState, forwardRef, useImperativeHandle, useRef } from "react";
+import { View, Text, Image, FlatList, ActivityIndicator } from "react-native";
 import api from "../../services/api";
-import {styles} from "./style";
+import { styles } from "./style";
 
-export const CardAll = () => {
+export const CardAll = forwardRef(({ headerComponent }, ref) => {
     const [poke, setPoke] = useState([]);
     const [dataPoke, setDataPoke] = useState([]);
     const [offset, setOffset] = useState(0);
     const [loading, setLoading] = useState(false);
     const [typeIcons, setTypeIcons] = useState({});
+    const flatListRef = useRef(null);
 
+    // Expõe o método scrollToTop para o componente pai (App)
+    useImperativeHandle(ref, () => ({
+        scrollToTop: () => {
+            flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
+        }
+    }));
+
+    // Busca os ícones dos tipos (seu código original)
     useEffect(() => {
         const fetchTypes = async () => {
             try {
@@ -29,6 +39,7 @@ export const CardAll = () => {
         fetchTypes();
     }, []);
 
+    // Busca a lista de Pokémon (seu código original)
     useEffect(() => {
         const fetchList = async () => {
             try {
@@ -44,6 +55,7 @@ export const CardAll = () => {
         fetchList();
     }, [offset]);
 
+    // Busca os detalhes (seu código original)
     useEffect(() => {
         const fetchDetails = async () => {
             try {
@@ -69,43 +81,49 @@ export const CardAll = () => {
 
     const renderFooter = () => {
         if (!loading) return null;
-        return (<View style={styles.footerLoader}>
-            <ActivityIndicator size="large" color="red"/>
-        </View>);
+        return (
+            <View style={styles.footerLoader}>
+                <ActivityIndicator size="large" color="red" />
+            </View>
+        );
     };
 
-    const renderItem = ({item}) => (<View style={styles.card}>
-        <Image
-            style={styles.image}
-            source={{
-                uri: item.sprites?.other?.["official-artwork"]?.front_default || item.sprites?.front_default
-            }}
-        />
-        <Text numberOfLines={1} style={styles.name}>
-            {item.name}
-        </Text>
-        <Text style={styles.id}>
-            #{String(item.id).padStart(3, "0")}
-        </Text>
-        <View style={styles.types}>
-            {item.types.map((t) => (<Image
-                key={t.type.name}
-                source={{uri: typeIcons[t.type.name]}}
-                style={styles.typeIcon}
-            />))}
+    const renderItem = ({ item }) => (
+        <View style={styles.card}>
+            <Image
+                style={styles.image}
+                source={{
+                    uri: item.sprites?.other?.["official-artwork"]?.front_default || item.sprites?.front_default
+                }}
+            />
+            <Text numberOfLines={1} style={styles.name}>{item.name}</Text>
+            <Text style={styles.id}>#{String(item.id).padStart(3, "0")}</Text>
+            <View style={styles.types}>
+                {item.types.map((t) => (
+                    <Image
+                        key={t.type.name}
+                        source={{ uri: typeIcons[t.type.name] }}
+                        style={styles.typeIcon}
+                    />
+                ))}
+            </View>
         </View>
-    </View>);
+    );
 
-    return (<View style={styles.wrapper}>
-        <FlatList
-            data={dataPoke}
-            keyExtractor={(item) => item.id.toString()}
-            renderItem={renderItem}
-            numColumns={2}
-            contentContainerStyle={styles.list}
-            onEndReached={loadMore}
-            onEndReachedThreshold={0.5}
-            ListFooterComponent={renderFooter}
-        />
-    </View>);
-};
+    return (
+        <View style={styles.wrapper}>
+            <FlatList
+                ref={flatListRef}
+                data={dataPoke}
+                keyExtractor={(item) => item.id.toString()}
+                renderItem={renderItem}
+                numColumns={2}
+                contentContainerStyle={styles.list}
+                onEndReached={loadMore}
+                onEndReachedThreshold={0.5}
+                ListFooterComponent={renderFooter}
+                ListHeaderComponent={headerComponent}  // cabeçalho vindo do App
+            />
+        </View>
+    );
+});
