@@ -38,7 +38,12 @@ export const styles = StyleSheet.create({
     },
 
     searchInput: {
-        flex: 1, backgroundColor: "#fff", borderRadius: 10, paddingHorizontal: 12, fontFamily: FONTS.minecraft, paddingTop: 20
+        flex: 1,
+        backgroundColor: "#fff",
+        borderRadius: 10,
+        paddingHorizontal: 12,
+        fontFamily: FONTS.minecraft,
+        paddingTop: 20
     },
 
     searchButton: {
@@ -64,7 +69,9 @@ export const styles = StyleSheet.create({
         borderColor: COLORS.textDark,
         width: "80%",
         padding: 24,
-        alignItems: "center"
+        alignItems: "center",
+        margin: "auto",
+        marginTop: 10
     },
 
     searchImage: {
@@ -85,5 +92,15 @@ export const styles = StyleSheet.create({
 
     errorText: {
         color: "#fff", fontSize: 18, fontFamily: FONTS.minecraft
+    }, loadingOverlay: {
+        position: "absolute",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: "rgba(0, 0, 0, 0.5)",
+        justifyContent: "center",
+        alignItems: "center",
+        zIndex: 10,
     },
 });
