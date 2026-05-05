@@ -3,10 +3,22 @@ import {COLORS, FONTS} from "../../styles/global";
 
 export const styles = StyleSheet.create({
     wrapper: {
-        width: "100%", flex: 1, backgroundColor: COLORS.danger,
-    }, list: {
-        paddingBottom: 40, justifyContent: "space-between",
-    }, card: {
+        width: "100%",
+        flex: 1,
+        backgroundColor: COLORS.danger,
+    },
+
+    list: {
+        paddingBottom: 40,
+        justifyContent: "space-between",
+    },
+
+    columnWrapper: {
+        zIndex: 1,
+        elevation: 1,
+    },
+
+    card: {
         backgroundColor: COLORS.redSecondary,
         borderRadius: 20,
         borderWidth: 6,
@@ -16,25 +28,59 @@ export const styles = StyleSheet.create({
         marginVertical: 10,
         padding: 16,
         alignItems: "center",
-    }, image: {
-        width: 120, height: 120, resizeMode: "contain",
-    }, name: {
+    },
+
+    image: {
+        width: 120,
+        height: 120,
+        resizeMode: "contain",
+    },
+
+    name: {
         color: COLORS.text,
         fontSize: 16,
         textTransform: "capitalize",
         marginTop: 6,
         fontFamily: FONTS.minecraft,
         textAlign: "center",
-    }, id: {
-        color: COLORS.text, fontSize: 14, fontFamily: FONTS.minecraft,
-    }, types: {
-        flexDirection: "row", gap: 6, marginTop: 6, flexWrap: "wrap", justifyContent: "center",
-    }, typeIcon: {
-        width: 60, height: 18, resizeMode: "contain",
-    }, footerLoader: {
-        paddingVertical: 20, alignItems: "center", justifyContent: "center",
-    }, searchContainer: {
-        flexDirection: "row", paddingHorizontal: 16, marginTop: 20, gap: 10
+    },
+
+    id: {
+        color: COLORS.text,
+        fontSize: 14,
+        fontFamily: FONTS.minecraft,
+    },
+
+    types: {
+        flexDirection: "row",
+        gap: 6,
+        marginTop: 6,
+        flexWrap: "wrap",
+        justifyContent: "center",
+    },
+
+    typeIcon: {
+        width: 60,
+        height: 18,
+        resizeMode: "contain",
+    },
+
+    footerLoader: {
+        paddingVertical: 20,
+        alignItems: "center",
+        justifyContent: "center",
+    },
+
+    searchArea: {
+        width: "100%",
+        marginBottom: 16,
+    },
+
+    searchContainer: {
+        flexDirection: "row",
+        paddingHorizontal: 16,
+        marginTop: 20,
+        gap: 10,
     },
 
     searchInput: {
@@ -43,7 +89,8 @@ export const styles = StyleSheet.create({
         borderRadius: 10,
         paddingHorizontal: 12,
         fontFamily: FONTS.minecraft,
-        paddingTop: 20
+        paddingTop: 20,
+        minHeight: 52,
     },
 
     searchButton: {
@@ -51,15 +98,14 @@ export const styles = StyleSheet.create({
         borderRadius: 10,
         justifyContent: "center",
         alignItems: "center",
-        paddingHorizontal: 16
+        paddingHorizontal: 16,
+        minHeight: 52,
     },
 
     searchButtonText: {
-        color: "#000", fontFamily: FONTS.minecraft, top: 3
-    },
-
-    searchWrapper: {
-        width: "100%", alignItems: "center", marginTop: 30
+        color: "#000",
+        fontFamily: FONTS.minecraft,
+        top: 3,
     },
 
     searchCard: {
@@ -70,29 +116,43 @@ export const styles = StyleSheet.create({
         width: "80%",
         padding: 24,
         alignItems: "center",
-        margin: "auto",
-        marginTop: 10
+        alignSelf: "center",
+        marginTop: 20,
     },
 
     searchImage: {
-        width: 200, height: 200, resizeMode: "contain"
+        width: 200,
+        height: 200,
+        resizeMode: "contain",
     },
 
     searchName: {
-        fontSize: 24, color: COLORS.text, fontFamily: FONTS.minecraft, textTransform: "capitalize", marginTop: 10
+        fontSize: 24,
+        color: COLORS.text,
+        fontFamily: FONTS.minecraft,
+        textTransform: "capitalize",
+        marginTop: 10,
     },
 
     searchId: {
-        fontSize: 18, color: COLORS.text, fontFamily: FONTS.minecraft
+        fontSize: 18,
+        color: COLORS.text,
+        fontFamily: FONTS.minecraft,
     },
 
     errorContainer: {
-        marginTop: 30, alignItems: "center"
+        marginTop: 30,
+        alignItems: "center",
     },
 
     errorText: {
-        color: "#fff", fontSize: 18, fontFamily: FONTS.minecraft
-    }, loadingOverlay: {
+        color: "#fff",
+        fontSize: 18,
+        fontFamily: FONTS.minecraft,
+        textAlign: "center",
+    },
+
+    loadingOverlay: {
         position: "absolute",
         top: 0,
         left: 0,
@@ -101,27 +161,57 @@ export const styles = StyleSheet.create({
         backgroundColor: "rgba(0, 0, 0, 0.5)",
         justifyContent: "center",
         alignItems: "center",
-        zIndex: 10,
+        zIndex: 9999999,
+        elevation: 9999999,
     },
-    suggestionsContainer: {
+
+    suggestionsOverlay: {
+        position: "absolute",
+        height: 220,
         backgroundColor: "#fff",
-        marginHorizontal: 16,
         borderRadius: 10,
-        marginTop: 5,
         overflow: "hidden",
-        zIndex: 5
+        zIndex: 9999999,
+        elevation: 9999999,
+        borderWidth: 4,
+        borderColor: COLORS.textDark,
+    },
+
+    suggestionsList: {
+        flex: 1,
+        height: 220,
+    },
+
+    suggestionsContent: {
+        paddingBottom: 4,
     },
 
     suggestionItem: {
-        padding: 12,
+        height: 48,
+        paddingHorizontal: 14,
+        paddingVertical: 8,
+        justifyContent: "space-between",
+        alignItems: "center",
+        flexDirection: "row",
         borderBottomWidth: 1,
-        borderBottomColor: "#eee"
+        borderBottomColor: "#ddd",
+        backgroundColor: "#fff",
     },
 
     suggestionText: {
         fontSize: 14,
         color: "#000",
         fontFamily: FONTS.minecraft,
-        top: 3
-    }
+        top: 3,
+        textTransform: "capitalize",
+        flex: 1,
+    },
+
+    suggestionId: {
+        fontSize: 12,
+        color: "#555",
+        fontFamily: FONTS.minecraft,
+        top: 3,
+        marginLeft: 8,
+    },
 });

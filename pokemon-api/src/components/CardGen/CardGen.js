@@ -11,7 +11,8 @@ import {
     Image,
     ActivityIndicator,
     TextInput,
-    TouchableOpacity
+    TouchableOpacity,
+    FlatList
 } from "react-native";
 import {KeyboardAwareFlatList} from "react-native-keyboard-aware-scroll-view";
 import api from "../../services/api";
@@ -34,14 +35,39 @@ export const CardGen = forwardRef(({headerComponent, generation, onLoadingChange
 
     const [suggestions, setSuggestions] = useState([]);
     const [debouncedQuery, setDebouncedQuery] = useState("");
+    const [dropdownPosition, setDropdownPosition] = useState(null);
 
+    const rootRef = useRef(null);
     const flatListRef = useRef(null);
+    const searchContainerRef = useRef(null);
 
     useImperativeHandle(ref, () => ({
         scrollToTop: () => {
             flatListRef.current?.scrollToOffset({offset: 0, animated: true});
         }
     }));
+
+    const normalizeSearch = (value) => {
+        return value
+            .toLowerCase()
+            .trim()
+            .replace("#", "")
+            .replace(/\s+/g, "-");
+    };
+
+    const measureDropdown = () => {
+        requestAnimationFrame(() => {
+            rootRef.current?.measureInWindow((rootX, rootY) => {
+                searchContainerRef.current?.measureInWindow((x, y, width, height) => {
+                    setDropdownPosition({
+                        top: y - rootY + height + 4,
+                        left: x - rootX,
+                        width
+                    });
+                });
+            });
+        });
+    };
 
     useEffect(() => {
         const handler = setTimeout(() => {
@@ -54,10 +80,11 @@ export const CardGen = forwardRef(({headerComponent, generation, onLoadingChange
     useEffect(() => {
         if (!debouncedQuery.trim()) {
             setSuggestions([]);
+            setDropdownPosition(null);
             return;
         }
 
-        const search = debouncedQuery.toLowerCase().trim();
+        const search = normalizeSearch(debouncedQuery);
 
         const filtered = pokemons
             .filter((p) => {
@@ -67,17 +94,30 @@ export const CardGen = forwardRef(({headerComponent, generation, onLoadingChange
                     String(p.id).padStart(3, "0").includes(search)
                 );
             })
-            .slice(0, 8)
+            .slice(0, 80)
             .map((p) => ({
-                name: p.name.charAt(0).toUpperCase() + p.name.slice(1)
+                name: p.name.charAt(0).toUpperCase() + p.name.slice(1),
+                id: p.id
             }));
 
         setSuggestions(filtered);
+
+        if (filtered.length > 0) {
+            measureDropdown();
+        } else {
+            setDropdownPosition(null);
+        }
     }, [debouncedQuery, pokemons]);
 
     const handleSelectSuggestion = (name) => {
         setQuery(name);
         setSuggestions([]);
+        setDropdownPosition(null);
+    };
+
+    const closeSuggestions = () => {
+        setSuggestions([]);
+        setDropdownPosition(null);
     };
 
     useEffect(() => {
@@ -99,6 +139,7 @@ export const CardGen = forwardRef(({headerComponent, generation, onLoadingChange
                 responses.forEach((res) => {
                     const typeName = res.data.name;
                     const icon = res.data.sprites?.["generation-viii"]?.["sword-shield"]?.name_icon;
+
                     icons[typeName] = icon;
                 });
 
@@ -139,6 +180,7 @@ export const CardGen = forwardRef(({headerComponent, generation, onLoadingChange
                 setSearchResult(null);
                 setError("");
                 setSuggestions([]);
+                setDropdownPosition(null);
                 setQuery("");
 
                 if (generationCache[generation]) {
@@ -170,7 +212,7 @@ export const CardGen = forwardRef(({headerComponent, generation, onLoadingChange
     }, [generation]);
 
     const loadMore = () => {
-        if (!loading && !searching && visible < pokemons.length) {
+        if (!loading && !searching && suggestions.length === 0 && visible < pokemons.length) {
             setVisible((prev) => prev + 20);
         }
     };
@@ -180,15 +222,16 @@ export const CardGen = forwardRef(({headerComponent, generation, onLoadingChange
             setSearching(false);
             setSearchResult(null);
             setError("");
-            setSuggestions([]);
+            closeSuggestions();
             return;
         }
 
         try {
             setSearchLoading(true);
             setError("");
+            closeSuggestions();
 
-            const search = query.toLowerCase().trim().replace("#", "");
+            const search = normalizeSearch(query);
 
             const found = pokemons.find((p) => {
                 return (
@@ -204,10 +247,6 @@ export const CardGen = forwardRef(({headerComponent, generation, onLoadingChange
             if (!found) {
                 setError("Pokémon não encontrado");
             }
-
-            setSuggestions([]);
-
-            flatListRef.current?.scrollToOffset({offset: 0, animated: true});
         } catch (err) {
             setError("Pokémon não encontrado");
             setSearching(true);
@@ -257,6 +296,52 @@ export const CardGen = forwardRef(({headerComponent, generation, onLoadingChange
         </View>
     );
 
+    const renderSuggestionsOverlay = () => {
+        if (suggestions.length === 0 || !dropdownPosition) return null;
+
+        return (
+            <View
+                style={[
+                    styles.suggestionsOverlay,
+                    {
+                        top: dropdownPosition.top,
+                        left: dropdownPosition.left,
+                        width: dropdownPosition.width
+                    }
+                ]}
+            >
+                <FlatList
+                    data={suggestions}
+                    keyExtractor={(item, index) => `${item.name}-${index}`}
+                    keyboardShouldPersistTaps="always"
+                    nestedScrollEnabled
+                    scrollEnabled
+                    showsVerticalScrollIndicator
+                    style={styles.suggestionsList}
+                    contentContainerStyle={styles.suggestionsContent}
+                    initialNumToRender={20}
+                    maxToRenderPerBatch={20}
+                    windowSize={5}
+                    renderItem={({item}) => (
+                        <TouchableOpacity
+                            style={styles.suggestionItem}
+                            activeOpacity={0.75}
+                            onPress={() => handleSelectSuggestion(item.name)}
+                        >
+                            <Text style={styles.suggestionText}>
+                                {item.name}
+                            </Text>
+
+                            <Text style={styles.suggestionId}>
+                                #{String(item.id).padStart(3, "0")}
+                            </Text>
+                        </TouchableOpacity>
+                    )}
+                />
+            </View>
+        );
+    };
+
     const renderSearchResult = () => {
         if (error) {
             return (
@@ -301,7 +386,7 @@ export const CardGen = forwardRef(({headerComponent, generation, onLoadingChange
     };
 
     return (
-        <View style={{flex: 1}}>
+        <View ref={rootRef} style={{flex: 1}}>
             <View style={styles.wrapper}>
                 <KeyboardAwareFlatList
                     innerRef={(ref) => (flatListRef.current = ref)}
@@ -310,12 +395,17 @@ export const CardGen = forwardRef(({headerComponent, generation, onLoadingChange
                     renderItem={renderItem}
                     numColumns={2}
                     contentContainerStyle={styles.list}
+                    columnWrapperStyle={styles.columnWrapper}
                     onEndReached={loadMore}
                     onEndReachedThreshold={0.5}
                     ListFooterComponent={renderFooter}
                     keyboardShouldPersistTaps="handled"
                     enableOnAndroid
                     extraScrollHeight={120}
+                    removeClippedSubviews={false}
+                    nestedScrollEnabled
+                    scrollEnabled={suggestions.length === 0}
+                    onScrollBeginDrag={closeSuggestions}
                     ListHeaderComponent={
                         <>
                             {headerComponent && headerComponent()}
@@ -326,47 +416,44 @@ export const CardGen = forwardRef(({headerComponent, generation, onLoadingChange
                                 </Text>
                             </View>
 
-                            <View style={styles.searchContainer}>
-                                <TextInput
-                                    placeholder="Nome ou número"
-                                    placeholderTextColor="#999"
-                                    style={styles.searchInput}
-                                    value={query}
-                                    onChangeText={setQuery}
-                                />
-
-                                <TouchableOpacity
-                                    style={styles.searchButton}
-                                    onPress={handleSearch}
-                                    disabled={searchLoading || loading}
+                            <View style={styles.searchArea}>
+                                <View
+                                    ref={searchContainerRef}
+                                    style={styles.searchContainer}
+                                    onLayout={measureDropdown}
                                 >
-                                    <Text style={styles.searchButtonText}>
-                                        Buscar
-                                    </Text>
-                                </TouchableOpacity>
-                            </View>
+                                    <TextInput
+                                        placeholder="Nome ou número"
+                                        placeholderTextColor="#999"
+                                        style={styles.searchInput}
+                                        value={query}
+                                        onFocus={measureDropdown}
+                                        onChangeText={(text) => {
+                                            setQuery(text);
+                                            measureDropdown();
+                                        }}
+                                    />
 
-                            {suggestions.length > 0 && (
-                                <View style={styles.suggestionsContainer}>
-                                    {suggestions.map((item, index) => (
-                                        <TouchableOpacity
-                                            key={index}
-                                            style={styles.suggestionItem}
-                                            onPress={() => handleSelectSuggestion(item.name)}
-                                        >
-                                            <Text style={styles.suggestionText}>
-                                                {item.name}
-                                            </Text>
-                                        </TouchableOpacity>
-                                    ))}
+                                    <TouchableOpacity
+                                        style={styles.searchButton}
+                                        onPress={handleSearch}
+                                        disabled={searchLoading || loading}
+                                        activeOpacity={0.8}
+                                    >
+                                        <Text style={styles.searchButtonText}>
+                                            Buscar
+                                        </Text>
+                                    </TouchableOpacity>
                                 </View>
-                            )}
+                            </View>
 
                             {searching && renderSearchResult()}
                         </>
                     }
                 />
             </View>
+
+            {renderSuggestionsOverlay()}
 
             {searchLoading && (
                 <View style={styles.loadingOverlay} pointerEvents="auto">

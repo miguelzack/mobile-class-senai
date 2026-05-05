@@ -13,6 +13,11 @@ export const styles = StyleSheet.create({
         justifyContent: "space-between",
     },
 
+    columnWrapper: {
+        zIndex: 1,
+        elevation: 1,
+    },
+
     generationTitleContainer: {
         width: "100%",
         alignItems: "center",
@@ -81,11 +86,16 @@ export const styles = StyleSheet.create({
         justifyContent: "center",
     },
 
+    searchArea: {
+        width: "100%",
+        marginBottom: 16,
+    },
+
     searchContainer: {
         flexDirection: "row",
         paddingHorizontal: 16,
         marginTop: 20,
-        gap: 10
+        gap: 10,
     },
 
     searchInput: {
@@ -94,7 +104,8 @@ export const styles = StyleSheet.create({
         borderRadius: 10,
         paddingHorizontal: 12,
         fontFamily: FONTS.minecraft,
-        paddingTop: 20
+        paddingTop: 20,
+        minHeight: 52,
     },
 
     searchButton: {
@@ -102,13 +113,14 @@ export const styles = StyleSheet.create({
         borderRadius: 10,
         justifyContent: "center",
         alignItems: "center",
-        paddingHorizontal: 16
+        paddingHorizontal: 16,
+        minHeight: 52,
     },
 
     searchButtonText: {
         color: "#000",
         fontFamily: FONTS.minecraft,
-        top: 3
+        top: 3,
     },
 
     searchCard: {
@@ -120,13 +132,13 @@ export const styles = StyleSheet.create({
         padding: 24,
         alignItems: "center",
         alignSelf: "center",
-        marginTop: 20
+        marginTop: 20,
     },
 
     searchImage: {
         width: 200,
         height: 200,
-        resizeMode: "contain"
+        resizeMode: "contain",
     },
 
     searchName: {
@@ -134,25 +146,25 @@ export const styles = StyleSheet.create({
         color: COLORS.text,
         fontFamily: FONTS.minecraft,
         textTransform: "capitalize",
-        marginTop: 10
+        marginTop: 10,
     },
 
     searchId: {
         fontSize: 18,
         color: COLORS.text,
-        fontFamily: FONTS.minecraft
+        fontFamily: FONTS.minecraft,
     },
 
     errorContainer: {
         marginTop: 30,
-        alignItems: "center"
+        alignItems: "center",
     },
 
     errorText: {
         color: "#fff",
         fontSize: 18,
         fontFamily: FONTS.minecraft,
-        textAlign: "center"
+        textAlign: "center",
     },
 
     loadingOverlay: {
@@ -164,28 +176,57 @@ export const styles = StyleSheet.create({
         backgroundColor: "rgba(0, 0, 0, 0.5)",
         justifyContent: "center",
         alignItems: "center",
-        zIndex: 10,
+        zIndex: 9999999,
+        elevation: 9999999,
     },
 
-    suggestionsContainer: {
+    suggestionsOverlay: {
+        position: "absolute",
+        height: 220,
         backgroundColor: "#fff",
-        marginHorizontal: 16,
         borderRadius: 10,
-        marginTop: 5,
         overflow: "hidden",
-        zIndex: 5
+        zIndex: 9999999,
+        elevation: 9999999,
+        borderWidth: 4,
+        borderColor: COLORS.textDark,
+    },
+
+    suggestionsList: {
+        flex: 1,
+        height: 220,
+    },
+
+    suggestionsContent: {
+        paddingBottom: 4,
     },
 
     suggestionItem: {
-        padding: 12,
+        height: 48,
+        paddingHorizontal: 14,
+        paddingVertical: 8,
+        justifyContent: "space-between",
+        alignItems: "center",
+        flexDirection: "row",
         borderBottomWidth: 1,
-        borderBottomColor: "#eee"
+        borderBottomColor: "#ddd",
+        backgroundColor: "#fff",
     },
 
     suggestionText: {
         fontSize: 14,
         color: "#000",
         fontFamily: FONTS.minecraft,
-        top: 3
-    }
+        top: 3,
+        textTransform: "capitalize",
+        flex: 1,
+    },
+
+    suggestionId: {
+        fontSize: 12,
+        color: "#555",
+        fontFamily: FONTS.minecraft,
+        top: 3,
+        marginLeft: 8,
+    },
 });
