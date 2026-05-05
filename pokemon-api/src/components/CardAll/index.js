@@ -201,7 +201,7 @@ export const CardAll = forwardRef(({headerComponent}, ref) => {
                     keyboardShouldPersistTaps="handled"
 
                     enableOnAndroid
-                    extraScrollHeight={120} // 🔥 ajuste fino aqui
+                    extraScrollHeight={120}
 
                     ListHeaderComponent={
                         <>
