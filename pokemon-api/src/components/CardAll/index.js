@@ -1,5 +1,13 @@
 import React, {useEffect, useState, forwardRef, useImperativeHandle, useRef} from "react";
-import {View, Text, Image, FlatList, ActivityIndicator, TextInput, TouchableOpacity} from "react-native";
+import {
+    View,
+    Text,
+    Image,
+    ActivityIndicator,
+    TextInput,
+    TouchableOpacity
+} from "react-native";
+import { KeyboardAwareFlatList } from "react-native-keyboard-aware-scroll-view";
 import api from "../../services/api";
 import {styles} from "./style";
 
@@ -109,91 +117,114 @@ export const CardAll = forwardRef(({headerComponent}, ref) => {
 
     const renderFooter = () => {
         if (!loading || searching) return null;
-        return (<View style={styles.footerLoader}>
-            <ActivityIndicator size="large" color="red"/>
-        </View>);
+        return (
+            <View style={styles.footerLoader}>
+                <ActivityIndicator size="large" color="red"/>
+            </View>
+        );
     };
 
-    const renderItem = ({item}) => (<View style={styles.card}>
-        <Image
-            style={styles.image}
-            source={{
-                uri: item.sprites?.other?.["official-artwork"]?.front_default || item.sprites?.front_default
-            }}
-        />
-        <Text numberOfLines={1} style={styles.name}>{item.name}</Text>
-        <Text style={styles.id}>#{String(item.id).padStart(3, "0")}</Text>
-        <View style={styles.types}>
-            {item.types.map((t) => (<Image
-                key={t.type.name}
-                source={{uri: typeIcons[t.type.name]}}
-                style={styles.typeIcon}
-            />))}
+    const renderItem = ({item}) => (
+        <View style={styles.card}>
+            <Image
+                style={styles.image}
+                source={{
+                    uri: item.sprites?.other?.["official-artwork"]?.front_default || item.sprites?.front_default
+                }}
+            />
+            <Text numberOfLines={1} style={styles.name}>{item.name}</Text>
+            <Text style={styles.id}>#{String(item.id).padStart(3, "0")}</Text>
+            <View style={styles.types}>
+                {item.types.map((t) => (
+                    <Image
+                        key={t.type.name}
+                        source={{uri: typeIcons[t.type.name]}}
+                        style={styles.typeIcon}
+                    />
+                ))}
+            </View>
         </View>
-    </View>);
+    );
 
     const renderSearchResult = () => {
         if (error) {
-            return (<View style={styles.errorContainer}>
-                <Text style={styles.errorText}>{error}</Text>
-            </View>);
+            return (
+                <View style={styles.errorContainer}>
+                    <Text style={styles.errorText}>{error}</Text>
+                </View>
+            );
         }
 
         if (!searchResult) return null;
 
-        return (<View style={styles.searchWrapper}>
-            <View style={styles.searchCard}>
-                <Image
-                    style={styles.searchImage}
-                    source={{
-                        uri: searchResult.sprites?.other?.["official-artwork"]?.front_default
-                    }}
-                />
-                <Text style={styles.searchName}>{searchResult.name}</Text>
-                <Text style={styles.searchId}>
-                    #{String(searchResult.id).padStart(3, "0")}
-                </Text>
+        return (
+            <View style={styles.searchWrapper}>
+                <View style={styles.searchCard}>
+                    <Image
+                        style={styles.searchImage}
+                        source={{
+                            uri: searchResult.sprites?.other?.["official-artwork"]?.front_default
+                        }}
+                    />
+                    <Text style={styles.searchName}>{searchResult.name}</Text>
+                    <Text style={styles.searchId}>
+                        #{String(searchResult.id).padStart(3, "0")}
+                    </Text>
 
-                <View style={styles.types}>
-                    {searchResult.types.map((t) => (<Image
-                        key={t.type.name}
-                        source={{uri: typeIcons[t.type.name]}}
-                        style={styles.typeIcon}
-                    />))}
+                    <View style={styles.types}>
+                        {searchResult.types.map((t) => (
+                            <Image
+                                key={t.type.name}
+                                source={{uri: typeIcons[t.type.name]}}
+                                style={styles.typeIcon}
+                            />
+                        ))}
+                    </View>
                 </View>
             </View>
-        </View>);
+        );
     };
 
-    return (<View style={styles.wrapper}>
-        <FlatList
-            ref={flatListRef}
-            data={searching ? [] : dataPoke}
-            keyExtractor={(item) => item.id?.toString()}
-            renderItem={renderItem}
-            numColumns={2}
-            contentContainerStyle={styles.list}
-            onEndReached={loadMore}
-            onEndReachedThreshold={0.5}
-            ListFooterComponent={renderFooter}
+    return (
+        <View style={{flex: 1}}>
+            <View style={styles.wrapper}>
+                <KeyboardAwareFlatList
+                    innerRef={(ref) => (flatListRef.current = ref)}
+                    data={searching ? [] : dataPoke}
+                    keyExtractor={(item) => item.id?.toString()}
+                    renderItem={renderItem}
+                    numColumns={2}
+                    contentContainerStyle={styles.list}
+                    onEndReached={loadMore}
+                    onEndReachedThreshold={0.5}
+                    ListFooterComponent={renderFooter}
+                    keyboardShouldPersistTaps="handled"
 
-            ListHeaderComponent={<>
-                {headerComponent && headerComponent()}
-                <View style={styles.searchContainer}>
-                    <TextInput
-                        placeholder="Nome ou número"
-                        placeholderTextColor="#999"
-                        style={styles.searchInput}
-                        value={query}
-                        onChangeText={setQuery}
-                    />
-                    <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
-                        <Text style={styles.searchButtonText}>Buscar</Text>
-                    </TouchableOpacity>
-                </View>
+                    enableOnAndroid
+                    extraScrollHeight={120} // 🔥 ajuste fino aqui
 
-                {searching && renderSearchResult()}
-            </>}
-        />
-    </View>);
+                    ListHeaderComponent={
+                        <>
+                            {headerComponent && headerComponent()}
+
+                            <View style={styles.searchContainer}>
+                                <TextInput
+                                    placeholder="Nome ou número"
+                                    placeholderTextColor="#999"
+                                    style={styles.searchInput}
+                                    value={query}
+                                    onChangeText={setQuery}
+                                />
+                                <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
+                                    <Text style={styles.searchButtonText}>Buscar</Text>
+                                </TouchableOpacity>
+                            </View>
+
+                            {searching && renderSearchResult()}
+                        </>
+                    }
+                />
+            </View>
+        </View>
+    );
 });
