@@ -14,47 +14,27 @@ export const styles = StyleSheet.create({
     },
 
     linkHeader: {
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "center",
+        flexDirection: "row", alignItems: "center", justifyContent: "center",
     },
 
     textLinkHeader: {
-        color: COLORS.text,
-        fontSize: 16,
-        fontFamily: FONTS.minecraft,
-        marginRight: 16,
-        top: 3
+        color: COLORS.text, fontSize: 16, fontFamily: FONTS.minecraft, marginRight: 16, top: 3
     },
 
     main: {
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        paddingVertical: 40,
-        paddingHorizontal: 16,
+        display: "flex", alignItems: "center", justifyContent: "center", paddingVertical: 40, paddingHorizontal: 16,
     },
 
     contentMain: {
-        display: "flex",
-        justifyContent: "center",
-        gap: 20,
-        width: "100%",
-        alignItems: "center",
-        textAlign: "center"
+        display: "flex", justifyContent: "center", gap: 20, width: "100%", alignItems: "center", textAlign: "center"
     },
 
     imageMain: {
-        width: "80%",
-        height: 108,
+        width: "80%", height: 108,
     },
 
     titleMain: {
-        textAlign: "center",
-        color: COLORS.text,
-        fontSize: 26,
-        fontFamily: FONTS.minecraft,
-        lineHeight: 34
+        textAlign: "center", color: COLORS.text, fontSize: 26, fontFamily: FONTS.minecraft, lineHeight: 34
     },
 
     titleSpanMain: {
@@ -62,11 +42,7 @@ export const styles = StyleSheet.create({
     },
 
     textMain: {
-        color: COLORS.text,
-        fontSize: 16,
-        fontFamily: FONTS.minecraft,
-        textAlign: "center",
-        lineHeight: 20
+        color: COLORS.text, fontSize: 16, fontFamily: FONTS.minecraft, textAlign: "center", lineHeight: 20
     },
 
     sectionViewCards: {
@@ -93,10 +69,7 @@ export const styles = StyleSheet.create({
     },
 
     textDescription: {
-        color: COLORS.text,
-        textAlign: "center",
-        fontFamily: FONTS.minecraft,
-        paddingTop: 10
+        color: COLORS.text, textAlign: "center", fontFamily: FONTS.minecraft, paddingTop: 10
     },
 
     modeButtonsContainer: {
@@ -109,28 +82,12 @@ export const styles = StyleSheet.create({
         flexWrap: "wrap"
     },
 
-    modeButton: {
-        backgroundColor: COLORS.redSecondary,
-        borderWidth: 4,
-        borderColor: COLORS.textDark,
-        borderRadius: 14,
-        paddingVertical: 12,
-        paddingHorizontal: 14,
-        minWidth: 145,
-        alignItems: "center",
-        justifyContent: "center"
-    },
-
     modeButtonActive: {
         backgroundColor: COLORS.accent,
     },
 
     modeButtonText: {
-        color: COLORS.text,
-        fontFamily: FONTS.minecraft,
-        fontSize: 13,
-        top: 3,
-        textAlign: "center"
+        color: COLORS.text, fontFamily: FONTS.minecraft, fontSize: 13, top: 3, textAlign: "center"
     },
 
     modeButtonTextActive: {
@@ -165,10 +122,7 @@ export const styles = StyleSheet.create({
     },
 
     generationButtonText: {
-        color: COLORS.text,
-        fontFamily: FONTS.minecraft,
-        fontSize: 12,
-        top: 3
+        color: COLORS.text, fontFamily: FONTS.minecraft, fontSize: 12, top: 3
     },
 
     generationButtonTextActive: {
@@ -189,11 +143,7 @@ export const styles = StyleSheet.create({
     },
 
     fullScreenLoadingText: {
-        color: COLORS.text,
-        fontFamily: FONTS.minecraft,
-        fontSize: 16,
-        marginTop: 16,
-        textAlign: "center"
+        color: COLORS.text, fontFamily: FONTS.minecraft, fontSize: 16, marginTop: 16, textAlign: "center"
     },
 
     fab: {
@@ -217,10 +167,49 @@ export const styles = StyleSheet.create({
     },
 
     fabText: {
-        fontSize: 36,
-        fontWeight: '800',
+        fontSize: 36, fontWeight: '800', color: COLORS.textDark, lineHeight: 36, transform: [{translateY: -2}],
+    }, typeButtonsContainer: {
+        width: "100%",
+        flexDirection: "row",
+        justifyContent: "center",
+        alignItems: "center",
+        gap: 8,
+        rowGap: 10,
+        marginTop: 16,
+        flexWrap: "wrap"
+    },
+
+    typeButton: {
+        backgroundColor: COLORS.redSecondary,
+        borderWidth: 3,
+        borderColor: COLORS.textDark,
+        borderRadius: 12,
+        paddingVertical: 10,
+        paddingHorizontal: 12,
+        minWidth: 88,
+        alignItems: "center",
+        justifyContent: "center"
+    },
+
+    typeButtonActive: {
+        backgroundColor: COLORS.accent,
+    },
+
+    typeButtonText: {
+        color: COLORS.text, fontFamily: FONTS.minecraft, fontSize: 11, top: 3, textAlign: "center"
+    },
+
+    typeButtonTextActive: {
         color: COLORS.textDark,
-        lineHeight: 36,
-        transform: [{translateY: -2}],
+    }, modeButton: {
+        backgroundColor: COLORS.redSecondary,
+        borderWidth: 4,
+        borderColor: COLORS.textDark,
+        borderRadius: 14,
+        paddingVertical: 12,
+        paddingHorizontal: 12,
+        minWidth: 105,
+        alignItems: "center",
+        justifyContent: "center"
     },
 });

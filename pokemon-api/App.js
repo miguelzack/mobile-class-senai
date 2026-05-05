@@ -16,15 +16,17 @@ import ActionButtons from "./src/components/ActionButtons";
 import { LinearGradient } from "expo-linear-gradient";
 import { CardAll } from "./src/components/CardAll";
 import { CardGen } from "./src/components/CardGen/CardGen";
+import { CardType } from "./src/components/CardType/CardType";
 
 export default function App() {
     const fontsLoaded = useGlobalFonts();
 
     const listRef = useRef(null);
 
-    const [mode, setMode] = useState("all"); // all | gen
+    const [mode, setMode] = useState("all"); // all | gen | type
     const [selectedGeneration, setSelectedGeneration] = useState(1);
-    const [generationLoading, setGenerationLoading] = useState(false);
+    const [selectedType, setSelectedType] = useState("water");
+    const [filterLoading, setFilterLoading] = useState(false);
 
     if (!fontsLoaded) return null;
 
@@ -37,6 +39,30 @@ export default function App() {
     };
 
     const generations = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+    const pokemonTypes = [
+        {label: "Normal", value: "normal"},
+        {label: "Fogo", value: "fire"},
+        {label: "Água", value: "water"},
+        {label: "Grama", value: "grass"},
+        {label: "Elétrico", value: "electric"},
+        {label: "Gelo", value: "ice"},
+        {label: "Lutador", value: "fighting"},
+        {label: "Veneno", value: "poison"},
+        {label: "Terra", value: "ground"},
+        {label: "Voador", value: "flying"},
+        {label: "Psíquico", value: "psychic"},
+        {label: "Inseto", value: "bug"},
+        {label: "Pedra", value: "rock"},
+        {label: "Fantasma", value: "ghost"},
+        {label: "Dragão", value: "dragon"},
+        {label: "Sombrio", value: "dark"},
+        {label: "Aço", value: "steel"},
+        {label: "Fada", value: "fairy"},
+    ];
+
+    const selectedTypeLabel =
+        pokemonTypes.find((type) => type.value === selectedType)?.label || selectedType;
 
     const HeaderComponent = () => (
         <>
@@ -80,7 +106,7 @@ export default function App() {
                         ]}
                         onPress={() => {
                             setMode("all");
-                            setGenerationLoading(false);
+                            setFilterLoading(false);
                             setTimeout(scrollToTop, 100);
                         }}
                     >
@@ -101,7 +127,7 @@ export default function App() {
                             mode === "gen" && styles.modeButtonActive
                         ]}
                         onPress={() => {
-                            setGenerationLoading(true);
+                            setFilterLoading(true);
                             setMode("gen");
                             setTimeout(scrollToTop, 100);
                         }}
@@ -113,6 +139,28 @@ export default function App() {
                             ]}
                         >
                             Gerações
+                        </Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        activeOpacity={0.8}
+                        style={[
+                            styles.modeButton,
+                            mode === "type" && styles.modeButtonActive
+                        ]}
+                        onPress={() => {
+                            setFilterLoading(true);
+                            setMode("type");
+                            setTimeout(scrollToTop, 100);
+                        }}
+                    >
+                        <Text
+                            style={[
+                                styles.modeButtonText,
+                                mode === "type" && styles.modeButtonTextActive
+                            ]}
+                        >
+                            Tipos
                         </Text>
                     </TouchableOpacity>
                 </View>
@@ -128,7 +176,7 @@ export default function App() {
                                     selectedGeneration === gen && styles.generationButtonActive
                                 ]}
                                 onPress={() => {
-                                    setGenerationLoading(true);
+                                    setFilterLoading(true);
                                     setSelectedGeneration(gen);
                                     setTimeout(scrollToTop, 100);
                                 }}
@@ -140,6 +188,35 @@ export default function App() {
                                     ]}
                                 >
                                     Gen {gen}
+                                </Text>
+                            </TouchableOpacity>
+                        ))}
+                    </View>
+                )}
+
+                {mode === "type" && (
+                    <View style={styles.typeButtonsContainer}>
+                        {pokemonTypes.map((type) => (
+                            <TouchableOpacity
+                                key={type.value}
+                                activeOpacity={0.8}
+                                style={[
+                                    styles.typeButton,
+                                    selectedType === type.value && styles.typeButtonActive
+                                ]}
+                                onPress={() => {
+                                    setFilterLoading(true);
+                                    setSelectedType(type.value);
+                                    setTimeout(scrollToTop, 100);
+                                }}
+                            >
+                                <Text
+                                    style={[
+                                        styles.typeButtonText,
+                                        selectedType === type.value && styles.typeButtonTextActive
+                                    ]}
+                                >
+                                    {type.label}
                                 </Text>
                             </TouchableOpacity>
                         ))}
@@ -160,26 +237,38 @@ export default function App() {
                 </TouchableOpacity>
             </View>
 
-            {mode === "all" ? (
+            {mode === "all" && (
                 <CardAll
                     ref={listRef}
                     headerComponent={HeaderComponent}
                 />
-            ) : (
+            )}
+
+            {mode === "gen" && (
                 <CardGen
                     ref={listRef}
                     headerComponent={HeaderComponent}
                     generation={selectedGeneration}
-                    onLoadingChange={setGenerationLoading}
+                    onLoadingChange={setFilterLoading}
                 />
             )}
 
-            {generationLoading && (
+            {mode === "type" && (
+                <CardType
+                    ref={listRef}
+                    headerComponent={HeaderComponent}
+                    type={selectedType}
+                    typeLabel={selectedTypeLabel}
+                    onLoadingChange={setFilterLoading}
+                />
+            )}
+
+            {filterLoading && (
                 <View style={styles.fullScreenLoading} pointerEvents="auto">
                     <ActivityIndicator size="large" color="red" />
 
                     <Text style={styles.fullScreenLoadingText}>
-                        Carregando geração...
+                        Carregando Pokémon...
                     </Text>
                 </View>
             )}
