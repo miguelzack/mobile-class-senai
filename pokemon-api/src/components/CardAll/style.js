@@ -33,5 +33,57 @@ export const styles = StyleSheet.create({
         width: 60, height: 18, resizeMode: "contain",
     }, footerLoader: {
         paddingVertical: 20, alignItems: "center", justifyContent: "center",
+    }, searchContainer: {
+        flexDirection: "row", paddingHorizontal: 16, marginTop: 20, gap: 10
+    },
+
+    searchInput: {
+        flex: 1, backgroundColor: "#fff", borderRadius: 10, paddingHorizontal: 12, fontFamily: FONTS.minecraft, paddingTop: 20
+    },
+
+    searchButton: {
+        backgroundColor: COLORS.accent,
+        borderRadius: 10,
+        justifyContent: "center",
+        alignItems: "center",
+        paddingHorizontal: 16
+    },
+
+    searchButtonText: {
+        color: "#000", fontFamily: FONTS.minecraft, top: 3
+    },
+
+    searchWrapper: {
+        width: "100%", alignItems: "center", marginTop: 30
+    },
+
+    searchCard: {
+        backgroundColor: COLORS.redSecondary,
+        borderRadius: 30,
+        borderWidth: 6,
+        borderColor: COLORS.textDark,
+        width: "80%",
+        padding: 24,
+        alignItems: "center"
+    },
+
+    searchImage: {
+        width: 200, height: 200, resizeMode: "contain"
+    },
+
+    searchName: {
+        fontSize: 24, color: COLORS.text, fontFamily: FONTS.minecraft, textTransform: "capitalize", marginTop: 10
+    },
+
+    searchId: {
+        fontSize: 18, color: COLORS.text, fontFamily: FONTS.minecraft
+    },
+
+    errorContainer: {
+        marginTop: 30, alignItems: "center"
+    },
+
+    errorText: {
+        color: "#fff", fontSize: 18, fontFamily: FONTS.minecraft
     },
 });
