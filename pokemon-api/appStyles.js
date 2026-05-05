@@ -67,6 +67,11 @@ export const styles = StyleSheet.create({
         borderColor: COLORS.textDark,
     }, fabText: {
         fontSize: 36, fontWeight: '800', color: COLORS.textDark, lineHeight: 36, transform: [{translateY: -2}],
-    },
+    }, textDescription: {
+        color: COLORS.text,
+        textAlign: "center",
+        fontFamily: FONTS.minecraft,
+        paddingTop: 10
+    }
 
 });

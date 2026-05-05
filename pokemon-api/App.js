@@ -22,8 +22,6 @@ export default function App() {
     const scrollToTop = () => {
         cardAllRef.current?.scrollToTop();
     };
-
-    // Cabeçalho que será fixado no topo da lista de Pokémon
     const HeaderComponent = () => (
         <>
             <LinearGradient colors={["#000", "#bb0d0d"]} style={styles.main}>
@@ -48,6 +46,7 @@ export default function App() {
                 <Text style={styles.textSectionView}>
                     Veja os <Text style={styles.textSectionSpan}>Pokémon</Text>
                 </Text>
+                <Text style={styles.textDescription}>Deixe o campo vazio e clique em buscar para voltar ao modo de lista.</Text>
             </View>
         </>
     );
@@ -64,7 +63,6 @@ export default function App() {
 
             <CardAll ref={cardAllRef} headerComponent={HeaderComponent} />
 
-            {/* Botão fixo sempre visível */}
             <TouchableOpacity style={styles.fab} onPress={scrollToTop} activeOpacity={0.7}>
                 <Text style={styles.fabText}>↑</Text>
             </TouchableOpacity>
