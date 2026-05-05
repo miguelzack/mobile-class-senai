@@ -18,6 +18,8 @@ export const CardAll = forwardRef(({headerComponent}, ref) => {
     const [searching, setSearching] = useState(false);
     const [error, setError] = useState("");
     const [searchLoading, setSearchLoading] = useState(false);
+    const [suggestions, setSuggestions] = useState([]);
+    const [debouncedQuery, setDebouncedQuery] = useState("");
 
     const flatListRef = useRef(null);
 
@@ -26,6 +28,47 @@ export const CardAll = forwardRef(({headerComponent}, ref) => {
             flatListRef.current?.scrollToOffset({offset: 0, animated: true});
         }
     }));
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedQuery(query);
+        }, 300);
+
+        return () => clearTimeout(handler);
+    }, [query]);
+
+    useEffect(() => {
+        const fetchSuggestions = async () => {
+            if (!debouncedQuery.trim()) {
+                setSuggestions([]);
+                return;
+            }
+
+            try {
+                const res = await api.get("pokemon?limit=1000");
+
+                const filtered = res.data.results
+                    .filter(p =>
+                        p.name.includes(debouncedQuery.toLowerCase())
+                    )
+                    .slice(0, 8)
+                    .map(p => ({
+                        name: p.name.charAt(0).toUpperCase() + p.name.slice(1)
+                    }));
+
+                setSuggestions(filtered);
+            } catch (err) {
+                console.log(err);
+            }
+        };
+
+        fetchSuggestions();
+    }, [debouncedQuery]);
+
+    const handleSelectSuggestion = (name) => {
+        setQuery(name);
+        setSuggestions([]);
+    };
 
     useEffect(() => {
         const fetchTypes = async () => {
@@ -195,6 +238,19 @@ export const CardAll = forwardRef(({headerComponent}, ref) => {
                             <Text style={styles.searchButtonText}>Buscar</Text>
                         </TouchableOpacity>
                     </View>
+                    {suggestions.length > 0 && (
+                        <View style={styles.suggestionsContainer}>
+                            {suggestions.map((item, index) => (
+                                <TouchableOpacity
+                                    key={index}
+                                    style={styles.suggestionItem}
+                                    onPress={() => handleSelectSuggestion(item.name)}
+                                >
+                                    <Text style={styles.suggestionText}>{item.name}</Text>
+                                </TouchableOpacity>
+                            ))}
+                        </View>
+                    )}
 
                     {searching && renderSearchResult()}
                 </>}

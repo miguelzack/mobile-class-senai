@@ -103,4 +103,25 @@ export const styles = StyleSheet.create({
         alignItems: "center",
         zIndex: 10,
     },
+    suggestionsContainer: {
+        backgroundColor: "#fff",
+        marginHorizontal: 16,
+        borderRadius: 10,
+        marginTop: 5,
+        overflow: "hidden",
+        zIndex: 5
+    },
+
+    suggestionItem: {
+        padding: 12,
+        borderBottomWidth: 1,
+        borderBottomColor: "#eee"
+    },
+
+    suggestionText: {
+        fontSize: 14,
+        color: "#000",
+        fontFamily: FONTS.minecraft,
+        top: 3
+    }
 });
