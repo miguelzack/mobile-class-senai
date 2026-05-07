@@ -117,7 +117,7 @@ export default function HomeScreen({ navigation }) {
       }
     >
       <View style={{ paddingHorizontal: 18 }}>
-        <Text style={{ color: colors.text, fontSize: 34, fontWeight: "900" }}>CineWatch</Text>
+        <Text style={{ color: colors.text, fontSize: 34, fontWeight: "900" }}>CineMood</Text>
         <Text style={{ color: colors.muted, marginTop: 6, fontSize: 15, lineHeight: 22 }}>
           Descubra filmes, salve listas, registre notas e organize o que você quer assistir.
         </Text>
