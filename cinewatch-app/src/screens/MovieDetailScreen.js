@@ -6,13 +6,15 @@ import { useMovies } from "../contexts/MovieContext";
 import { getBackdropUrl, getMovieDetails, getPosterUrl } from "../services/tmdb";
 import { colors } from "../styles/theme";
 
-function ActionButton({ label, active, onPress, danger = false }) {
+function ActionButton({ label, active, onPress, danger = false, full = false }) {
   return (
     <TouchableOpacity
       activeOpacity={0.85}
       onPress={onPress}
       style={{
-        flex: 1,
+        flex: full ? 0 : 1,
+        width: full ? "100%" : undefined,
+        minHeight: 48,
         backgroundColor: danger ? colors.danger : active ? colors.primary : colors.surface,
         borderWidth: 1,
         borderColor: danger ? colors.danger : active ? colors.primary : colors.border,
@@ -20,9 +22,17 @@ function ActionButton({ label, active, onPress, danger = false }) {
         paddingVertical: 12,
         paddingHorizontal: 10,
         alignItems: "center",
+        justifyContent: "center",
       }}
     >
-      <Text style={{ color: colors.text, fontWeight: "900", textAlign: "center" }}>{label}</Text>
+      <Text
+        numberOfLines={2}
+        adjustsFontSizeToFit
+        minimumFontScale={0.86}
+        style={{ color: colors.text, fontWeight: "900", textAlign: "center", lineHeight: 18 }}
+      >
+        {label}
+      </Text>
     </TouchableOpacity>
   );
 }
@@ -170,23 +180,27 @@ export default function MovieDetailScreen({ route }) {
           />
         </View>
 
-        <View style={{ flexDirection: "row", gap: 10, marginTop: 10 }}>
+        <View style={{ marginTop: 10 }}>
           <ActionButton
-            label={watched ? "Remover assistido" : "+ Assistidos"}
+            label={watched ? "✓ Assistido — tocar para remover" : "+ Adicionar em assistidos"}
             active={watched}
             danger={watched}
+            full
             onPress={handleToggleWatched}
           />
-          <ActionButton
-            label={reaction === "like" ? "👍 Curtido" : "👍 Like"}
-            active={reaction === "like"}
-            onPress={() => setMovieReaction(movie, "like")}
-          />
-          <ActionButton
-            label={reaction === "dislike" ? "👎 Não curti" : "👎 Dislike"}
-            active={reaction === "dislike"}
-            onPress={() => setMovieReaction(movie, "dislike")}
-          />
+
+          <View style={{ flexDirection: "row", gap: 10, marginTop: 10 }}>
+            <ActionButton
+              label={reaction === "like" ? "👍 Curtido" : "👍 Like"}
+              active={reaction === "like"}
+              onPress={() => setMovieReaction(movie, "like")}
+            />
+            <ActionButton
+              label={reaction === "dislike" ? "👎 Não curti" : "👎 Dislike"}
+              active={reaction === "dislike"}
+              onPress={() => setMovieReaction(movie, "dislike")}
+            />
+          </View>
         </View>
 
         <View style={{ marginTop: 26 }}>

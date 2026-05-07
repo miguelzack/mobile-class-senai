@@ -178,7 +178,7 @@ export default function SuggestionsScreen({ navigation, route }) {
         <View style={{ paddingHorizontal: 18 }}>
           <Text style={{ color: colors.text, fontSize: 30, fontWeight: "900" }}>Quiz de sugestões 🎲</Text>
           <Text style={{ color: colors.muted, marginTop: 6, lineHeight: 21 }}>
-            Responda perguntas rápidas e o app monta uma recomendação combinando clima, companhia e ritmo.
+            Escolha primeiro o gênero principal. Depois o app refina por clima, companhia, ritmo e sensação final sem ignorar essa escolha.
           </Text>
 
           <ProgressBar currentStep={currentStep} />
@@ -241,6 +241,26 @@ export default function SuggestionsScreen({ navigation, route }) {
       <View style={{ paddingHorizontal: 18, paddingBottom: 14 }}>
         <Text style={{ color: colors.text, fontSize: 30, fontWeight: "900" }}>{selected?.emoji} {selected?.title}</Text>
         <Text style={{ color: colors.muted, marginTop: 6, lineHeight: 20 }}>{selected?.subtitle}</Text>
+
+        {!!selected?.debugTags?.length && (
+          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 12 }}>
+            {selected.debugTags.map((tag) => (
+              <View
+                key={tag}
+                style={{
+                  backgroundColor: colors.surface,
+                  borderWidth: 1,
+                  borderColor: colors.border,
+                  borderRadius: 999,
+                  paddingHorizontal: 10,
+                  paddingVertical: 7,
+                }}
+              >
+                <Text style={{ color: colors.muted, fontSize: 12, fontWeight: "800" }}>{tag}</Text>
+              </View>
+            ))}
+          </View>
+        )}
 
         <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 10, marginTop: 14 }}>
           <TouchableOpacity

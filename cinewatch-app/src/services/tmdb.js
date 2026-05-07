@@ -205,68 +205,486 @@ export const suggestionOptions = [
 
 export const suggestionQuizQuestions = [
   {
-    id: "mood",
-    title: "Como você está hoje?",
-    subtitle: "Escolha o clima principal da sessão.",
-    xp: 25,
+    id: "genre",
+    title: "Primeiro: qual tipo de filme você quer?",
+    subtitle: "Essa escolha vira a regra principal do quiz. As próximas respostas refinam, mas não trocam esse gênero.",
+    xp: 30,
     options: [
-      { id: "happy", emoji: "😄", title: "Leve", subtitle: "Quero rir ou relaxar", genres: [35, 12, 10751], excludeGenres: [27] },
-      { id: "adrenaline", emoji: "🔥", title: "Elétrico", subtitle: "Quero ação e ritmo", genres: [28, 12, 878] },
-      { id: "thinking", emoji: "🧠", title: "Reflexivo", subtitle: "Quero pensar", genres: [9648, 18, 878], voteCount: 60 },
-      { id: "fear", emoji: "👻", title: "Tenso", subtitle: "Terror ou suspense", genres: [27, 53, 9648] },
+      {
+        id: "horror",
+        primaryKey: "horror",
+        emoji: "👻",
+        title: "Terror",
+        subtitle: "Medo, tensão, sobrenatural ou terror psicológico",
+        primaryGenres: [27],
+        voteCount: 70,
+      },
+      {
+        id: "action",
+        primaryKey: "action",
+        emoji: "🔥",
+        title: "Ação / Aventura",
+        subtitle: "Ritmo alto, lutas, perseguição e grandes cenas",
+        primaryGenres: [28, 12],
+        voteCount: 120,
+      },
+      {
+        id: "comedy",
+        primaryKey: "comedy",
+        emoji: "😄",
+        title: "Comédia",
+        subtitle: "Algo leve, divertido ou para rir sem pensar muito",
+        primaryGenres: [35],
+        voteCount: 80,
+      },
+      {
+        id: "romance",
+        primaryKey: "romance",
+        emoji: "💖",
+        title: "Romance",
+        subtitle: "Histórias de casal, paixão, encontros e relações",
+        primaryGenres: [10749],
+        voteCount: 70,
+      },
+      {
+        id: "mystery",
+        primaryKey: "mystery",
+        emoji: "🕵️",
+        title: "Mistério / Suspense",
+        subtitle: "Investigação, segredos, tensão e reviravoltas",
+        primaryGenres: [9648, 53],
+        voteCount: 70,
+      },
+      {
+        id: "scifi",
+        primaryKey: "scifi",
+        emoji: "🚀",
+        title: "Ficção científica",
+        subtitle: "Tecnologia, futuro, espaço, ideias e possibilidades",
+        primaryGenres: [878],
+        voteCount: 80,
+      },
+      {
+        id: "drama",
+        primaryKey: "drama",
+        emoji: "🎭",
+        title: "Drama",
+        subtitle: "Histórias fortes, humanas e mais emocionais",
+        primaryGenres: [18],
+        voteCount: 100,
+      },
+      {
+        id: "family",
+        primaryKey: "family",
+        emoji: "👨‍👩‍👧",
+        title: "Família / Animação",
+        subtitle: "Filmes seguros, mágicos ou bons para assistir junto",
+        primaryGenres: [16, 10751],
+        voteCount: 80,
+      },
+      {
+        id: "fantasy",
+        primaryKey: "fantasy",
+        emoji: "🐉",
+        title: "Fantasia",
+        subtitle: "Mundos mágicos, aventura e imaginação",
+        primaryGenres: [14, 12],
+        voteCount: 90,
+      },
+    ],
+  },
+  {
+    id: "tone",
+    title: "Qual clima combina com esse gênero?",
+    subtitle: "Aqui o app tenta achar uma mistura coerente, sem abandonar sua primeira escolha.",
+    xp: 20,
+    options: [
+      {
+        id: "light",
+        emoji: "🌤️",
+        title: "Mais leve",
+        subtitle: "Quero algo agradável dentro desse tipo",
+        refineGenres: [35, 12, 10751],
+        refineByPrimary: {
+          horror: [35],
+          action: [35, 12],
+          comedy: [10751, 12],
+          romance: [35],
+          mystery: [35, 12],
+          scifi: [12, 35],
+          drama: [35, 10749],
+          family: [16, 10751],
+          fantasy: [12, 10751],
+        },
+        excludeGenres: [80],
+        voteCount: 90,
+      },
+      {
+        id: "dark",
+        emoji: "🌑",
+        title: "Mais sombrio",
+        subtitle: "Pode ser pesado, tenso ou estranho",
+        refineGenres: [53, 80, 9648, 18],
+        refineByPrimary: {
+          horror: [53, 9648],
+          action: [53, 80],
+          comedy: [80],
+          romance: [18, 9648],
+          mystery: [53, 80],
+          scifi: [53, 9648],
+          drama: [80, 53],
+          family: [14, 12],
+          fantasy: [9648, 53],
+        },
+        voteCount: 100,
+      },
+      {
+        id: "smart",
+        emoji: "🧠",
+        title: "Quero pensar",
+        subtitle: "Filme com ideia, mistério ou camada extra",
+        refineGenres: [9648, 878, 18],
+        refineByPrimary: {
+          horror: [9648, 53],
+          action: [878, 53],
+          comedy: [18, 10749],
+          romance: [18],
+          mystery: [9648, 53],
+          scifi: [9648, 18],
+          drama: [9648],
+          family: [14, 12],
+          fantasy: [9648, 18],
+        },
+        sortBy: "vote_average.desc",
+        voteCount: 120,
+      },
+      {
+        id: "emotional",
+        emoji: "🥹",
+        title: "Mais emocional",
+        subtitle: "Quero me importar com os personagens",
+        refineGenres: [18, 10749],
+        refineByPrimary: {
+          horror: [18, 9648],
+          action: [18, 12],
+          comedy: [18, 10749],
+          romance: [18],
+          mystery: [18, 9648],
+          scifi: [18],
+          drama: [10749],
+          family: [16, 10751],
+          fantasy: [18, 10749],
+        },
+        voteCount: 100,
+      },
+      {
+        id: "epic",
+        emoji: "⚔️",
+        title: "Épico / grandioso",
+        subtitle: "Quero algo com escala grande",
+        refineGenres: [12, 14, 878, 28],
+        refineByPrimary: {
+          horror: [53, 14],
+          action: [12, 878],
+          comedy: [12],
+          romance: [18, 12],
+          mystery: [53, 12],
+          scifi: [12, 28],
+          drama: [36, 10752],
+          family: [12, 14],
+          fantasy: [12, 14],
+        },
+        voteCount: 180,
+      },
     ],
   },
   {
     id: "company",
     title: "Com quem você vai assistir?",
-    subtitle: "Isso ajuda a ajustar o tipo de filme.",
+    subtitle: "Essa resposta ajusta o tom sem quebrar o gênero principal.",
     xp: 20,
     options: [
-      { id: "alone", emoji: "🎧", title: "Sozinho", subtitle: "Pode ser mais imersivo", genres: [18, 9648, 878] },
-      { id: "family", emoji: "👨‍👩‍👧", title: "Família", subtitle: "Algo seguro para todos", genres: [16, 10751, 12], excludeGenres: [27, 53] },
-      { id: "friends", emoji: "🎮", title: "Amigos", subtitle: "Diversão e energia", genres: [35, 28, 12] },
-      { id: "couple", emoji: "💖", title: "Casal", subtitle: "Romance, comédia ou drama", genres: [10749, 35, 18] },
+      {
+        id: "alone",
+        emoji: "🎧",
+        title: "Sozinho",
+        subtitle: "Pode ser mais imersivo",
+        refineGenres: [18, 9648, 878, 53],
+        refineByPrimary: {
+          horror: [9648, 53],
+          action: [53, 878],
+          comedy: [18],
+          romance: [18],
+          mystery: [9648, 53],
+          scifi: [9648, 18],
+          drama: [18],
+          family: [14],
+          fantasy: [14, 18],
+        },
+        voteCount: 80,
+      },
+      {
+        id: "family",
+        emoji: "👨‍👩‍👧",
+        title: "Família",
+        subtitle: "Mais acessível para todo mundo",
+        refineGenres: [16, 10751, 12, 35],
+        refineByPrimary: {
+          horror: [35],
+          action: [12],
+          comedy: [10751, 12],
+          romance: [35],
+          mystery: [12],
+          scifi: [12],
+          drama: [10751],
+          family: [16, 10751],
+          fantasy: [12, 10751],
+        },
+        excludeGenres: [80],
+        voteCount: 80,
+      },
+      {
+        id: "friends",
+        emoji: "🎮",
+        title: "Amigos",
+        subtitle: "Diversão, comentários e energia",
+        refineGenres: [35, 28, 12, 53],
+        refineByPrimary: {
+          horror: [35, 53],
+          action: [35, 12],
+          comedy: [12],
+          romance: [35],
+          mystery: [53, 35],
+          scifi: [28, 12],
+          drama: [35],
+          family: [12],
+          fantasy: [12],
+        },
+        voteCount: 120,
+      },
+      {
+        id: "couple",
+        emoji: "💖",
+        title: "Casal",
+        subtitle: "Algo para assistir junto e comentar depois",
+        refineGenres: [10749, 35, 18],
+        refineByPrimary: {
+          horror: [9648, 53],
+          action: [12, 35],
+          comedy: [10749],
+          romance: [35, 18],
+          mystery: [53, 18],
+          scifi: [18, 10749],
+          drama: [10749],
+          family: [16, 10751],
+          fantasy: [10749, 12],
+        },
+        voteCount: 100,
+      },
     ],
   },
   {
     id: "pace",
-    title: "Qual ritmo combina mais?",
-    subtitle: "Rápido, calmo ou equilibrado?",
-    xp: 20,
-    options: [
-      { id: "fast", emoji: "⚡", title: "Rápido", subtitle: "Sem enrolação", genres: [28, 53, 12], sortBy: "popularity.desc" },
-      { id: "calm", emoji: "🌙", title: "Calmo", subtitle: "Para assistir tranquilo", genres: [35, 10749, 18], excludeGenres: [27, 28, 53] },
-      { id: "balanced", emoji: "🎬", title: "Equilibrado", subtitle: "História boa e acessível", genres: [18, 12, 35], sortBy: "vote_average.desc", voteCount: 300 },
-      { id: "surprise", emoji: "🎁", title: "Surpresa", subtitle: "Pode misturar tudo", genres: [12, 14, 878, 9648] },
-    ],
-  },
-  {
-    id: "time",
-    title: "Quanto tempo você quer investir?",
-    subtitle: "Não consigo filtrar duração sem detalhes individuais, então uso isso para ajustar popularidade/nota.",
+    title: "Qual ritmo você quer?",
+    subtitle: "Agora o quiz ajusta intensidade, nota e popularidade.",
     xp: 15,
     options: [
-      { id: "short", emoji: "⏱️", title: "Pouco tempo", subtitle: "Escolhas fáceis", sortBy: "popularity.desc", voteCount: 180 },
-      { id: "normal", emoji: "🍿", title: "Sessão normal", subtitle: "Filmes conhecidos", sortBy: "popularity.desc", voteCount: 120 },
-      { id: "deep", emoji: "📚", title: "Pode ser longo", subtitle: "Quero algo mais forte", sortBy: "vote_average.desc", voteCount: 700 },
+      {
+        id: "fast",
+        emoji: "⚡",
+        title: "Rápido",
+        subtitle: "Quero ritmo e pouca enrolação",
+        refineGenres: [28, 53, 12],
+        refineByPrimary: {
+          horror: [53],
+          action: [28, 12],
+          comedy: [12],
+          romance: [35],
+          mystery: [53],
+          scifi: [28, 12],
+          drama: [53],
+          family: [12],
+          fantasy: [12],
+        },
+        sortBy: "popularity.desc",
+        voteCount: 100,
+      },
+      {
+        id: "balanced",
+        emoji: "🎬",
+        title: "Equilibrado",
+        subtitle: "Quero uma escolha segura",
+        sortBy: "popularity.desc",
+        voteCount: 160,
+      },
+      {
+        id: "calm",
+        emoji: "🌙",
+        title: "Calmo",
+        subtitle: "Sem tanta correria",
+        refineGenres: [18, 35, 10749],
+        refineByPrimary: {
+          horror: [9648],
+          action: [12],
+          comedy: [10749],
+          romance: [18],
+          mystery: [9648],
+          scifi: [18],
+          drama: [18],
+          family: [16, 10751],
+          fantasy: [14],
+        },
+        sortBy: "vote_average.desc",
+        voteCount: 120,
+      },
+      {
+        id: "deep",
+        emoji: "📚",
+        title: "Mais profundo",
+        subtitle: "Pode ser mais sério ou marcante",
+        refineGenres: [18, 9648, 878],
+        refineByPrimary: {
+          horror: [9648, 18],
+          action: [18, 53],
+          comedy: [18],
+          romance: [18],
+          mystery: [9648, 18],
+          scifi: [18, 9648],
+          drama: [9648],
+          family: [14],
+          fantasy: [18, 9648],
+        },
+        sortBy: "vote_average.desc",
+        voteCount: 260,
+      },
     ],
   },
   {
     id: "ending",
     title: "Que sensação você quer no final?",
-    subtitle: "Último toque para fechar a recomendação.",
+    subtitle: "Último toque: ele combina com o gênero escolhido, sem jogar sua resposta principal fora.",
     xp: 20,
     options: [
-      { id: "smile", emoji: "😊", title: "Sair sorrindo", subtitle: "Final mais leve", genres: [35, 10751, 12], excludeGenres: [27] },
-      { id: "wow", emoji: "🤯", title: "Ficar impactado", subtitle: "Mistério, sci-fi ou suspense", genres: [9648, 878, 53] },
-      { id: "cry", emoji: "🥹", title: "Me emocionar", subtitle: "Drama e romance", genres: [18, 10749] },
-      { id: "classic", emoji: "🏆", title: "Ver algo bom", subtitle: "Mais bem avaliados", sortBy: "vote_average.desc", voteCount: 900 },
+      {
+        id: "smile",
+        emoji: "😊",
+        title: "Sair sorrindo",
+        subtitle: "Uma versão mais divertida do que escolhi",
+        refineGenres: [35, 10751, 12],
+        refineByPrimary: {
+          horror: [35],
+          action: [35, 12],
+          comedy: [12, 10751],
+          romance: [35],
+          mystery: [35],
+          scifi: [12, 35],
+          drama: [35, 10749],
+          family: [16, 10751],
+          fantasy: [12, 10751],
+        },
+        excludeGenres: [80],
+        sortBy: "popularity.desc",
+        voteCount: 70,
+      },
+      {
+        id: "wow",
+        emoji: "🤯",
+        title: "Ficar impactado",
+        subtitle: "Reviravolta, tensão ou algo memorável",
+        refineGenres: [9648, 878, 53],
+        refineByPrimary: {
+          horror: [9648, 53],
+          action: [53, 878],
+          comedy: [9648],
+          romance: [18, 9648],
+          mystery: [9648, 53],
+          scifi: [9648, 53],
+          drama: [9648, 53],
+          family: [14, 12],
+          fantasy: [9648, 878],
+        },
+        sortBy: "vote_average.desc",
+        voteCount: 180,
+      },
+      {
+        id: "cry",
+        emoji: "🥹",
+        title: "Me emocionar",
+        subtitle: "Quero sentir alguma coisa",
+        refineGenres: [18, 10749],
+        refineByPrimary: {
+          horror: [18],
+          action: [18],
+          comedy: [18, 10749],
+          romance: [18],
+          mystery: [18],
+          scifi: [18],
+          drama: [10749],
+          family: [16, 10751],
+          fantasy: [18],
+        },
+        sortBy: "vote_average.desc",
+        voteCount: 140,
+      },
+      {
+        id: "classic",
+        emoji: "🏆",
+        title: "Ver algo bom",
+        subtitle: "Priorizar nota alta e filmes confiáveis",
+        sortBy: "vote_average.desc",
+        voteCount: 700,
+      },
+      {
+        id: "open_end",
+        emoji: "🌀",
+        title: "Final para teorizar",
+        subtitle: "Quero terminar pensando",
+        refineGenres: [9648, 878, 53],
+        refineByPrimary: {
+          horror: [9648, 53],
+          action: [53, 878],
+          comedy: [9648],
+          romance: [18, 9648],
+          mystery: [9648, 53],
+          scifi: [9648, 18],
+          drama: [9648],
+          family: [14],
+          fantasy: [9648, 14],
+        },
+        sortBy: "vote_average.desc",
+        voteCount: 160,
+      },
     ],
   },
 ];
 
 function uniqueNumbers(values) {
-  return Array.from(new Set(values.filter(Boolean)));
+  return Array.from(new Set(values.filter((value) => Number.isFinite(value))));
+}
+
+function countAndRankGenres(genres) {
+  const scores = new Map();
+  genres.forEach((genreId) => {
+    if (!genreId) return;
+    scores.set(genreId, (scores.get(genreId) || 0) + 1);
+  });
+
+  return Array.from(scores.entries())
+    .sort((a, b) => b[1] - a[1])
+    .map(([genreId]) => genreId);
+}
+
+function getOptionRefiners(option, primaryKey) {
+  if (!option) return [];
+  const specific = option.refineByPrimary?.[primaryKey];
+  if (Array.isArray(specific)) return specific;
+  return option.refineGenres || [];
+}
+
+function buildGenreQuery(primaryGenres, refineGenres = []) {
+  const primaryClause = primaryGenres.join("|");
+  const refineClause = refineGenres.join("|");
+  return refineClause ? `${primaryClause},${refineClause}` : primaryClause;
 }
 
 export function buildQuizSuggestion(answers) {
@@ -274,47 +692,108 @@ export function buildQuizSuggestion(answers) {
     .map((question) => question.options.find((option) => option.id === answers[question.id]))
     .filter(Boolean);
 
-  const genres = uniqueNumbers(selectedOptions.flatMap((option) => option.genres || []));
-  const excludeGenres = uniqueNumbers(selectedOptions.flatMap((option) => option.excludeGenres || []));
-  const lastSort = [...selectedOptions].reverse().find((option) => option.sortBy)?.sortBy;
-  const maxVoteCount = Math.max(...selectedOptions.map((option) => option.voteCount || 0), 80);
-  const main = selectedOptions[0] || { emoji: "🎲", title: "Resultado" };
-  const totalXp = suggestionQuizQuestions.reduce((sum, question) => sum + question.xp, 0);
+  const primary = selectedOptions.find((option) => option.primaryGenres?.length) || selectedOptions[0];
+  const primaryGenres = uniqueNumbers(primary?.primaryGenres || primary?.genres || []);
+  const primaryKey = primary?.primaryKey || "default";
 
-  const params = {
+  const rawRefiners = selectedOptions
+    .filter((option) => option !== primary)
+    .flatMap((option) => getOptionRefiners(option, primaryKey));
+
+  const rankedRefiners = countAndRankGenres(rawRefiners)
+    .filter((genreId) => !primaryGenres.includes(genreId));
+
+  const strongRefiners = rankedRefiners.slice(0, 2);
+  const softerRefiners = rankedRefiners.slice(0, 1);
+
+  const excludeGenres = uniqueNumbers(
+    selectedOptions.flatMap((option) => option.excludeGenres || [])
+  ).filter((genreId) => !primaryGenres.includes(genreId) && !rankedRefiners.includes(genreId));
+
+  const lastSort = [...selectedOptions].reverse().find((option) => option.sortBy)?.sortBy;
+  const maxVoteCount = Math.max(...selectedOptions.map((option) => option.voteCount || 0), 60);
+  const totalXp = suggestionQuizQuestions.reduce((sum, question) => sum + question.xp, 0);
+  const choiceTrail = selectedOptions.map((option) => `${option.emoji || "🎬"} ${option.title}`);
+
+  const baseParams = {
     sort_by: lastSort || "popularity.desc",
     "vote_count.gte": String(maxVoteCount),
   };
 
-  if (genres.length) params.with_genres = genres.join("|");
-  if (excludeGenres.length) params.without_genres = excludeGenres.join(",");
+  if (excludeGenres.length) {
+    baseParams.without_genres = excludeGenres.join(",");
+  }
+
+  const primaryOnly = primaryGenres.length ? buildGenreQuery(primaryGenres) : undefined;
+  const strictGenreQuery = primaryGenres.length ? buildGenreQuery(primaryGenres, strongRefiners) : undefined;
+  const softGenreQuery = primaryGenres.length ? buildGenreQuery(primaryGenres, softerRefiners) : undefined;
+
+  const queryVariants = [];
+
+  if (strictGenreQuery) {
+    queryVariants.push({
+      ...baseParams,
+      with_genres: strictGenreQuery,
+    });
+  }
+
+  if (softGenreQuery && softGenreQuery !== strictGenreQuery) {
+    queryVariants.push({
+      ...baseParams,
+      "vote_count.gte": String(Math.min(maxVoteCount, 120)),
+      with_genres: softGenreQuery,
+    });
+  }
+
+  if (primaryOnly) {
+    queryVariants.push({
+      sort_by: lastSort || "popularity.desc",
+      "vote_count.gte": "30",
+      with_genres: primaryOnly,
+      ...(excludeGenres.length ? { without_genres: excludeGenres.join(",") } : {}),
+    });
+  }
+
+  if (!queryVariants.length) {
+    queryVariants.push(baseParams);
+  }
 
   return {
     id: `quiz-${Date.now()}`,
-    title: `Seu combo: ${main.title}`,
-    subtitle: `Quiz completo • ${totalXp} XP • ${selectedOptions.map((option) => option.title).join(" + ")}`,
-    emoji: main.emoji || "🎲",
-    params,
-    fallbackParams: {
-      sort_by: "popularity.desc",
-      "vote_count.gte": "20",
-      ...(genres.length ? { with_genres: genres.slice(0, 4).join("|") } : {}),
-    },
+    title: `${primary?.emoji || "🎲"} ${primary?.title || "Resultado personalizado"}`,
+    subtitle: `Quiz completo • ${totalXp} XP • ${choiceTrail.join(" + ")}`,
+    emoji: primary?.emoji || "🎲",
+    params: queryVariants[0],
+    queryVariants,
+    debugTags: choiceTrail,
+    fallbackParams: queryVariants[queryVariants.length - 1],
   };
 }
 
 export async function discoverMoviesBySuggestion(option, page = 1) {
-  const data = await discoverMoviesPage({
-    sort_by: "popularity.desc",
-    "vote_count.gte": "120",
-    ...(option.params || {}),
-  }, page);
+  const variants = option.queryVariants?.length
+    ? option.queryVariants
+    : [
+        {
+          sort_by: "popularity.desc",
+          "vote_count.gte": "120",
+          ...(option.params || {}),
+        },
+        option.fallbackParams,
+      ].filter(Boolean);
 
-  if (data.results.length > 0 || !option.fallbackParams) {
-    return data;
+  let lastData = { results: [], page, totalPages: 1 };
+
+  for (const params of variants) {
+    const data = await discoverMoviesPage(params, page);
+    lastData = data;
+
+    if (data.results.length > 0) {
+      return data;
+    }
   }
 
-  return discoverMoviesPage(option.fallbackParams, page);
+  return lastData;
 }
 
 export const franchiseCollections = [
