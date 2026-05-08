@@ -75,7 +75,7 @@ export default function FranchisesScreen({ navigation }) {
         setErrorMessage("Não consegui encontrar filmes para essa franquia agora.");
       }
     } catch (error) {
-      console.log(error);
+      
       setMovies([]);
       setErrorMessage("Não foi possível carregar essa franquia agora.");
     } finally {

@@ -86,7 +86,7 @@ export default function MovieDetailScreen({ route }) {
         const data = await getMovieDetails(baseMovie.id);
         setDetails(data);
       } catch (error) {
-        console.log(error);
+        
       } finally {
         setLoading(false);
       }

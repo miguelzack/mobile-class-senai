@@ -1,41 +1,83 @@
-import React, { useEffect, useState } from "react";
-import { ActivityIndicator, FlatList, Text, TextInput, View } from "react-native";
+import React, { useEffect, useMemo, useState } from "react";
+import { ActivityIndicator, FlatList, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
 import EmptyState from "../components/EmptyState";
 import MovieCard from "../components/MovieCard";
-import { searchMovies } from "../services/tmdb";
+import { MOVIE_GENRES } from "../services/clubService";
+import { discoverMovies, searchMovies } from "../services/tmdb";
 import { colors } from "../styles/theme";
+
+function GenreFilterChip({ genre, selected, onPress }) {
+  return (
+    <TouchableOpacity
+      activeOpacity={0.85}
+      onPress={onPress}
+      style={{
+        minHeight: 42,
+        minWidth: 74,
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: selected ? colors.primary : colors.surface,
+        borderColor: selected ? colors.primary : colors.border,
+        borderWidth: 1,
+        borderRadius: 999,
+        paddingHorizontal: 14,
+        paddingVertical: 9,
+        marginRight: 8,
+      }}
+    >
+      <Text numberOfLines={1} style={{ color: colors.text, fontWeight: "900", fontSize: 12 }}>
+        {genre.name}
+      </Text>
+    </TouchableOpacity>
+  );
+}
 
 export default function SearchScreen({ navigation }) {
   const [query, setQuery] = useState("");
+  const [selectedGenre, setSelectedGenre] = useState(null);
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  const activeGenreName = useMemo(() => MOVIE_GENRES.find((genre) => genre.id === selectedGenre)?.name, [selectedGenre]);
+
   useEffect(() => {
     const timeout = setTimeout(async () => {
-      if (!query.trim()) {
+      const term = query.trim();
+
+      if (!term && !selectedGenre) {
         setMovies([]);
         return;
       }
 
       try {
         setLoading(true);
-        const data = await searchMovies(query);
-        setMovies(data);
+        if (term) {
+          const data = await searchMovies(term);
+          const filtered = selectedGenre ? data.filter((movie) => movie.genre_ids?.includes(selectedGenre)) : data;
+          setMovies(filtered);
+        } else {
+          const data = await discoverMovies({
+            with_genres: String(selectedGenre),
+            sort_by: "popularity.desc",
+            "vote_count.gte": "100",
+          });
+          setMovies(data);
+        }
       } catch (error) {
-        console.log(error);
+        setMovies([]);
       } finally {
         setLoading(false);
       }
     }, 450);
 
     return () => clearTimeout(timeout);
-  }, [query]);
+  }, [query, selectedGenre]);
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background, paddingTop: 58, paddingHorizontal: 18 }}>
       <Text style={{ color: colors.text, fontSize: 30, fontWeight: "900" }}>Pesquisar</Text>
-      <Text style={{ color: colors.muted, marginTop: 6 }}>
-        Busque filmes pelo nome e abra os detalhes para salvar nas listas.
+      <Text style={{ color: colors.muted, marginTop: 6, lineHeight: 21 }}>
+        Busque por nome ou escolha um gênero para ver apenas filmes daquele tipo.
       </Text>
 
       <TextInput
@@ -56,14 +98,34 @@ export default function SearchScreen({ navigation }) {
         }}
       />
 
-      {loading && <ActivityIndicator style={{ marginTop: 24 }} color={colors.primary} />}
+      <View style={{ marginTop: 14, height: 48 }}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={{ flexGrow: 0 }}
+          contentContainerStyle={{ alignItems: "center", paddingRight: 18 }}
+        >
+          <GenreFilterChip genre={{ id: null, name: "Todos" }} selected={!selectedGenre} onPress={() => setSelectedGenre(null)} />
+          {MOVIE_GENRES.map((genre) => (
+            <GenreFilterChip key={genre.id} genre={genre} selected={selectedGenre === genre.id} onPress={() => setSelectedGenre(genre.id)} />
+          ))}
+        </ScrollView>
+      </View>
 
-      {!loading && !query.trim() && (
-        <EmptyState title="Digite um nome de filme" description="A pesquisa começa automaticamente enquanto você digita." />
+      {!!activeGenreName && (
+        <Text style={{ color: colors.secondary, fontWeight: "900", marginTop: 10 }}>
+          Filtro ativo: {activeGenreName}
+        </Text>
       )}
 
-      {!loading && query.trim() && movies.length === 0 && (
-        <EmptyState title="Nenhum filme encontrado" description="Tente procurar por outro título." />
+      {loading && <ActivityIndicator style={{ marginTop: 24 }} color={colors.primary} />}
+
+      {!loading && !query.trim() && !selectedGenre && (
+        <EmptyState title="Digite um nome ou escolha um gênero" description="A pesquisa começa automaticamente enquanto você digita ou filtra." />
+      )}
+
+      {!loading && (query.trim() || selectedGenre) && movies.length === 0 && (
+        <EmptyState title="Nenhum filme encontrado" description="Tente procurar outro título ou mudar o gênero." />
       )}
 
       <FlatList

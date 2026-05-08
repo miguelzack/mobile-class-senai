@@ -7,13 +7,16 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
     "newArchEnabled": true,
+    "scheme": "cinemood",
+    "primaryColor": "#E50914",
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#0B0B14"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.miguelzack.cinemood"
     },
     "android": {
       "package": "com.miguelzack.cinemood",
@@ -35,8 +38,6 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "scheme": "cinemood",
-    "primaryColor": "#E50914",
     "extra": {
       "eas": {
         "projectId": "b1e5e346-e542-45fc-a597-36658404c5ef"

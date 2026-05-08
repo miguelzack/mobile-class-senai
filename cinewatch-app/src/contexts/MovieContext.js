@@ -1,5 +1,7 @@
-import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { initialMovieState, loadMovieState, saveMovieState } from "../storage/movieStorage";
+import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { useAuth } from "./AuthContext";
+import { loadCloudMovieState, saveCloudMovieState } from "../services/movieCloudStorage";
+import { initialMovieState, loadMovieState, mergeMovieStates, saveMovieState } from "../storage/movieStorage";
 
 const MovieContext = createContext(null);
 
@@ -17,33 +19,89 @@ function normalizeMovie(movie) {
 }
 
 function existsById(list, movieId) {
-  return list.some((item) => item.id === movieId);
+  return list.some((item) => String(item.id) === String(movieId));
 }
 
 function removeById(list, movieId) {
-  return list.filter((item) => item.id !== movieId);
+  return list.filter((item) => String(item.id) !== String(movieId));
 }
 
 export function MovieProvider({ children }) {
+  const { user } = useAuth();
   const [state, setState] = useState(initialMovieState);
   const [loadingLocalData, setLoadingLocalData] = useState(true);
+  const [cloudSyncStatus, setCloudSyncStatus] = useState("idle");
+  const userIdRef = useRef(user?.id || null);
+
+  useEffect(() => {
+    userIdRef.current = user?.id || null;
+  }, [user?.id]);
+
+  async function persistState(updatedState, statusLabel = "saving") {
+    const userId = userIdRef.current;
+    await saveMovieState(updatedState, userId);
+
+    if (!userId) return;
+
+    try {
+      setCloudSyncStatus(statusLabel);
+      await saveCloudMovieState(userId, updatedState);
+      setCloudSyncStatus("synced");
+    } catch (error) {
+      
+      setCloudSyncStatus("error");
+    }
+  }
+
+  async function syncWithCloud() {
+    const userId = userIdRef.current;
+    if (!userId) return;
+
+    try {
+      setCloudSyncStatus("syncing");
+      const localState = await loadMovieState(userId);
+      const cloudState = await loadCloudMovieState(userId);
+      const merged = mergeMovieStates(localState, cloudState || initialMovieState);
+
+      setState(merged);
+      await saveMovieState(merged, userId);
+      await saveCloudMovieState(userId, merged);
+      setCloudSyncStatus("synced");
+    } catch (error) {
+      
+      const localState = await loadMovieState(userId);
+      setState(localState);
+      setCloudSyncStatus("error");
+    } finally {
+      setLoadingLocalData(false);
+    }
+  }
 
   useEffect(() => {
     async function load() {
-      const saved = await loadMovieState();
-      setState(saved);
-      setLoadingLocalData(false);
+      if (!user?.id) {
+        setState(initialMovieState);
+        setLoadingLocalData(false);
+        return;
+      }
+
+      setLoadingLocalData(true);
+      await syncWithCloud();
     }
 
     load();
-  }, []);
+  }, [user?.id]);
 
   function updateState(callback) {
     setState((current) => {
       const updated = callback({ ...initialMovieState, ...current });
-      saveMovieState(updated);
+      persistState(updated);
       return updated;
     });
+  }
+
+  async function forceSaveCloud() {
+    await persistState(state, "saving");
   }
 
   function toggleFavorite(movie) {
@@ -84,6 +142,31 @@ export function MovieProvider({ children }) {
             watchedAt: currentInfo?.watchedAt || new Date().toISOString(),
           },
         },
+      };
+    });
+  }
+
+
+  function markMoviesAsWatched(movies) {
+    const items = (movies || []).map(normalizeMovie).filter((item) => item.id);
+    if (!items.length) return;
+
+    updateState((current) => {
+      const watched = { ...current.watched };
+      const now = new Date().toISOString();
+
+      items.forEach((item) => {
+        const currentInfo = watched[item.id];
+        watched[item.id] = {
+          movie: item,
+          rating: currentInfo?.rating || 0,
+          watchedAt: currentInfo?.watchedAt || now,
+        };
+      });
+
+      return {
+        ...current,
+        watched,
       };
     });
   }
@@ -135,6 +218,84 @@ export function MovieProvider({ children }) {
     });
   }
 
+  function saveClubReviewToPrivateMovie(movie, rating, sourceId, noteText = "") {
+    if (!movie) return;
+
+    const item = normalizeMovie(movie);
+    const safeRating = Math.max(0, Math.min(5, Number(rating) || 0));
+    const cleanNote = noteText.trim();
+    const noteId = sourceId ? `club-${sourceId}` : null;
+    const now = new Date().toISOString();
+
+    updateState((current) => {
+      const currentInfo = current.watched[item.id] || {
+        movie: item,
+        watchedAt: now,
+      };
+
+      const nextState = {
+        ...current,
+        watched: {
+          ...current.watched,
+          [item.id]: {
+            ...currentInfo,
+            movie: item,
+            rating: safeRating,
+            watchedAt: currentInfo.watchedAt || now,
+          },
+        },
+      };
+
+      if (!cleanNote || !noteId) {
+        return nextState;
+      }
+
+      const currentNotesInfo = current.movieNotes?.[item.id] || {
+        movie: item,
+        notes: [],
+      };
+
+      const existingNotes = currentNotesInfo.notes || [];
+      const alreadyExists = existingNotes.some((note) => note.id === noteId);
+      const nextNotes = alreadyExists
+        ? existingNotes.map((note) => {
+            if (note.id !== noteId) return note;
+
+            return {
+              ...note,
+              text: cleanNote,
+              source: "club",
+              sourceId,
+              updatedAt: now,
+            };
+          })
+        : [
+            {
+              id: noteId,
+              text: cleanNote,
+              source: "club",
+              sourceId,
+              createdAt: now,
+              updatedAt: null,
+            },
+            ...existingNotes,
+          ];
+
+      return {
+        ...nextState,
+        movieNotes: {
+          ...(current.movieNotes || {}),
+          [item.id]: {
+            ...currentNotesInfo,
+            movie: item,
+            notes: nextNotes,
+            updatedAt: now,
+          },
+        },
+      };
+    });
+  }
+
   function addMovieNote(movie, text) {
     const cleanText = text.trim();
     if (!cleanText) return;
@@ -163,6 +324,62 @@ export function MovieProvider({ children }) {
             movie: item,
             notes: [note, ...(currentNotesInfo.notes || [])],
             updatedAt: new Date().toISOString(),
+          },
+        },
+      };
+    });
+  }
+
+  function saveMovieNoteFromClub(movie, sourceId, text) {
+    const cleanText = text.trim();
+    if (!cleanText) return;
+
+    const item = normalizeMovie(movie);
+    const noteId = `club-${sourceId}`;
+
+    updateState((current) => {
+      const currentNotesInfo = current.movieNotes?.[item.id] || {
+        movie: item,
+        notes: [],
+      };
+
+      const existingNotes = currentNotesInfo.notes || [];
+      const alreadyExists = existingNotes.some((note) => note.id === noteId);
+      const now = new Date().toISOString();
+
+      const nextNotes = alreadyExists
+        ? existingNotes.map((note) => {
+            if (note.id !== noteId) return note;
+
+            return {
+              ...note,
+              text: cleanText,
+              source: "club",
+              sourceId,
+              updatedAt: now,
+            };
+          })
+        : [
+            {
+              id: noteId,
+              text: cleanText,
+              source: "club",
+              sourceId,
+              createdAt: now,
+              updatedAt: null,
+            },
+            ...existingNotes,
+          ];
+
+      return {
+        ...current,
+        movieNotes: {
+          ...(current.movieNotes || {}),
+          [item.id]: {
+            ...currentNotesInfo,
+            movie: item,
+            notes: nextNotes,
+            updatedAt: now,
           },
         },
       };
@@ -358,16 +575,22 @@ export function MovieProvider({ children }) {
   const value = {
     state,
     loadingLocalData,
+    cloudSyncStatus,
+    syncWithCloud,
+    forceSaveCloud,
     watchedList,
     likedMovies,
     dislikedMovies,
     toggleFavorite,
     toggleWatchlist,
     markMovieAsWatched,
+    markMoviesAsWatched,
     removeMovieFromWatched,
     toggleWatched,
     saveMovieRating,
+    saveClubReviewToPrivateMovie,
     addMovieNote,
+    saveMovieNoteFromClub,
     updateMovieNote,
     removeMovieNote,
     getMovieNotes,

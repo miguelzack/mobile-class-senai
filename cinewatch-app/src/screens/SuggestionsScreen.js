@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { ActivityIndicator, FlatList, Text, TouchableOpacity, View } from "react-native";
 import EmptyState from "../components/EmptyState";
 import MovieCard from "../components/MovieCard";
@@ -71,6 +71,8 @@ export default function SuggestionsScreen({ navigation, route }) {
   const [loadingInitial, setLoadingInitial] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const quizListRef = useRef(null);
+  const resultListRef = useRef(null);
 
   const totalXp = useMemo(
     () => suggestionQuizQuestions.reduce((sum, question) => sum + question.xp, 0),
@@ -98,7 +100,7 @@ export default function SuggestionsScreen({ navigation, route }) {
         setErrorMessage("Não encontrei filmes para esse resultado. Refazer o quiz pode abrir outras combinações.");
       }
     } catch (error) {
-      console.log(error);
+      
       if (replace) {
         setMovies([]);
         setErrorMessage("Não foi possível carregar as sugestões agora.");
@@ -114,6 +116,9 @@ export default function SuggestionsScreen({ navigation, route }) {
     setMode("result");
     setPage(1);
     setHasMore(false);
+    requestAnimationFrame(() => {
+      resultListRef.current?.scrollToOffset?.({ offset: 0, animated: false });
+    });
     loadSuggestionPage(option, 1, true);
   }
 
@@ -169,6 +174,13 @@ export default function SuggestionsScreen({ navigation, route }) {
     }
   }, [route?.params?.initialSuggestionId]);
 
+  useEffect(() => {
+    if (mode !== "quiz") return;
+    requestAnimationFrame(() => {
+      quizListRef.current?.scrollToOffset?.({ offset: 0, animated: false });
+    });
+  }, [currentStep, mode]);
+
   if (mode === "quiz") {
     const question = suggestionQuizQuestions[currentStep];
     const earnedXp = suggestionQuizQuestions.slice(0, currentStep).reduce((sum, item) => sum + item.xp, 0);
@@ -200,7 +212,8 @@ export default function SuggestionsScreen({ navigation, route }) {
         </View>
 
         <FlatList
-          key="quiz-options-list"
+          ref={quizListRef}
+          key={`quiz-options-list-${currentStep}`}
           data={question.options}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => <QuizOption option={item} onPress={handleAnswer} />}
@@ -300,6 +313,7 @@ export default function SuggestionsScreen({ navigation, route }) {
         </View>
       ) : (
         <FlatList
+          ref={resultListRef}
           key="suggestion-results-grid"
           data={movies}
           keyExtractor={(item, index) => `${item.id}-${index}`}

@@ -81,7 +81,7 @@ export default function HomeScreen({ navigation }) {
       setTrending(trendingData);
       setSections(sectionData);
     } catch (error) {
-      console.log(error);
+      
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -117,10 +117,21 @@ export default function HomeScreen({ navigation }) {
       }
     >
       <View style={{ paddingHorizontal: 18 }}>
-        <Text style={{ color: colors.text, fontSize: 34, fontWeight: "900" }}>CineMood</Text>
-        <Text style={{ color: colors.muted, marginTop: 6, fontSize: 15, lineHeight: 22 }}>
-          Descubra filmes, salve listas, registre notas e organize o que você quer assistir.
-        </Text>
+        <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
+          <View style={{ flex: 1 }}>
+            <Text style={{ color: colors.text, fontSize: 34, fontWeight: "900" }}>CineMood</Text>
+            <Text style={{ color: colors.muted, marginTop: 6, fontSize: 15, lineHeight: 22 }}>
+              Descubra filmes, salve listas, registre notas e organize o que você quer assistir.
+            </Text>
+          </View>
+          <TouchableOpacity
+            activeOpacity={0.85}
+            onPress={() => navigation.navigate("Profile")}
+            style={{ backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, borderRadius: 999, paddingHorizontal: 13, paddingVertical: 10 }}
+          >
+            <Text style={{ color: colors.text, fontWeight: "900" }}>Perfil</Text>
+          </TouchableOpacity>
+        </View>
 
         <View
           style={{
