@@ -4,6 +4,7 @@
 
 drop table if exists public.club_private_comments cascade;
 drop table if exists public.club_reviews cascade;
+drop table if exists public.club_movie_seen cascade;
 drop table if exists public.club_movie_votes cascade;
 drop table if exists public.club_movies cascade;
 drop table if exists public.club_members cascade;

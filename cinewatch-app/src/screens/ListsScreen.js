@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { Alert, FlatList, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Alert, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
 import EmptyState from "../components/EmptyState";
 import MovieCard from "../components/MovieCard";
 import RatingStars from "../components/RatingStars";
@@ -13,6 +13,15 @@ const tabs = [
   { id: "disliked", label: "Não curti" },
   { id: "watched", label: "Assistidos" },
   { id: "custom", label: "Minhas listas" },
+];
+
+const sortOptions = [
+  { id: "default", label: "Padrão" },
+  { id: "myRatingDesc", label: "Minha nota ↓" },
+  { id: "myRatingAsc", label: "Minha nota ↑" },
+  { id: "tmdbDesc", label: "Nota TMDB ↓" },
+  { id: "titleAsc", label: "A-Z" },
+  { id: "yearDesc", label: "Ano ↓" },
 ];
 
 function TabButton({ tab, activeTab, setActiveTab }) {
@@ -36,13 +45,13 @@ function TabButton({ tab, activeTab, setActiveTab }) {
   );
 }
 
-function SmallButton({ label, onPress, danger = false, primary = false }) {
+function SmallButton({ label, onPress, danger = false, primary = false, secondary = false }) {
   return (
     <TouchableOpacity
       activeOpacity={0.85}
       onPress={onPress}
       style={{
-        backgroundColor: primary ? colors.primary : danger ? colors.danger : colors.surfaceLight,
+        backgroundColor: primary ? colors.primary : danger ? colors.danger : secondary ? colors.background : colors.surfaceLight,
         borderWidth: 1,
         borderColor: primary ? colors.primary : danger ? colors.danger : colors.border,
         borderRadius: 999,
@@ -55,31 +64,122 @@ function SmallButton({ label, onPress, danger = false, primary = false }) {
   );
 }
 
-function MovieListItem({ movie, navigation, onRemove }) {
+function ControlChip({ label, active, onPress }) {
+  return (
+    <TouchableOpacity
+      activeOpacity={0.85}
+      onPress={onPress}
+      style={{
+        backgroundColor: active ? colors.primary : colors.surface,
+        borderColor: active ? colors.primary : colors.border,
+        borderWidth: 1,
+        borderRadius: 999,
+        paddingHorizontal: 12,
+        paddingVertical: 9,
+        marginRight: 8,
+      }}
+    >
+      <Text style={{ color: colors.text, fontWeight: "900", fontSize: 12 }}>{label}</Text>
+    </TouchableOpacity>
+  );
+}
+
+function MovieListItem({ movie, navigation, rating = 0, notesCount = 0, watched = false, onRemove, removeLabel = "Remover" }) {
   return (
     <View
       style={{
-        backgroundColor: colors.background,
+        backgroundColor: colors.surface,
         borderWidth: 1,
         borderColor: colors.border,
-        borderRadius: 16,
-        padding: 12,
-        marginTop: 10,
+        borderRadius: 18,
+        padding: 14,
+        marginBottom: 12,
       }}
     >
       <TouchableOpacity activeOpacity={0.85} onPress={() => navigation.navigate("MovieDetail", { movie })}>
-        <Text style={{ color: colors.text, fontWeight: "900", fontSize: 15 }}>{movie.title}</Text>
-        <Text style={{ color: colors.muted, marginTop: 4 }}>
-          ⭐ {movie.vote_average ? movie.vote_average.toFixed(1) : "N/A"} • {(movie.release_date || "----").slice(0, 4)}
-        </Text>
+        <View style={{ flexDirection: "row", justifyContent: "space-between", gap: 10 }}>
+          <View style={{ flex: 1 }}>
+            <Text style={{ color: colors.text, fontWeight: "900", fontSize: 16 }}>{movie.title || "Filme sem título"}</Text>
+            <Text style={{ color: colors.muted, marginTop: 4 }}>
+              ⭐ {movie.vote_average ? movie.vote_average.toFixed(1) : "N/A"} • {(movie.release_date || "----").slice(0, 4)}
+            </Text>
+          </View>
+          {watched && (
+            <View style={{ backgroundColor: colors.success, borderRadius: 999, paddingHorizontal: 10, paddingVertical: 6, alignSelf: "flex-start" }}>
+              <Text style={{ color: colors.text, fontWeight: "900", fontSize: 11 }}>✓ Já vi</Text>
+            </View>
+          )}
+        </View>
+        {!!rating && (
+          <View style={{ marginTop: 8 }}>
+            <RatingStars rating={rating} size={22} />
+          </View>
+        )}
+        {notesCount > 0 && <Text style={{ color: colors.muted, marginTop: 8 }}>{notesCount} anotação(ões)</Text>}
       </TouchableOpacity>
 
       <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 10 }}>
-        <SmallButton label="Abrir" onPress={() => navigation.navigate("MovieDetail", { movie })} />
-        <SmallButton label="Remover da lista" danger onPress={onRemove} />
+        <SmallButton label="Abrir detalhes" onPress={() => navigation.navigate("MovieDetail", { movie })} />
+        {!!onRemove && <SmallButton label={removeLabel} danger onPress={onRemove} />}
       </View>
     </View>
   );
+}
+
+function sortMovies(movies, sortMode, watchedMap = {}) {
+  const copy = [...movies];
+
+  function personalRating(movie) {
+    return Number(watchedMap?.[movie.id]?.rating || 0);
+  }
+
+  if (sortMode === "myRatingDesc") {
+    return copy.sort((a, b) => personalRating(b) - personalRating(a) || Number(b.vote_average || 0) - Number(a.vote_average || 0));
+  }
+
+  if (sortMode === "myRatingAsc") {
+    return copy.sort((a, b) => personalRating(a) - personalRating(b) || Number(a.vote_average || 0) - Number(b.vote_average || 0));
+  }
+
+  if (sortMode === "tmdbDesc") {
+    return copy.sort((a, b) => Number(b.vote_average || 0) - Number(a.vote_average || 0));
+  }
+
+  if (sortMode === "titleAsc") {
+    return copy.sort((a, b) => String(a.title || "").localeCompare(String(b.title || "")));
+  }
+
+  if (sortMode === "yearDesc") {
+    return copy.sort((a, b) => Number((b.release_date || "0").slice(0, 4)) - Number((a.release_date || "0").slice(0, 4)));
+  }
+
+  return copy;
+}
+
+function sortWatchedItems(items, sortMode) {
+  const copy = [...items];
+
+  if (sortMode === "default" || sortMode === "myRatingDesc") {
+    return copy.sort((a, b) => Number(b.rating || 0) - Number(a.rating || 0));
+  }
+
+  if (sortMode === "myRatingAsc") {
+    return copy.sort((a, b) => Number(a.rating || 0) - Number(b.rating || 0));
+  }
+
+  if (sortMode === "tmdbDesc") {
+    return copy.sort((a, b) => Number(b.movie?.vote_average || 0) - Number(a.movie?.vote_average || 0));
+  }
+
+  if (sortMode === "titleAsc") {
+    return copy.sort((a, b) => String(a.movie?.title || "").localeCompare(String(b.movie?.title || "")));
+  }
+
+  if (sortMode === "yearDesc") {
+    return copy.sort((a, b) => Number((b.movie?.release_date || "0").slice(0, 4)) - Number((a.movie?.release_date || "0").slice(0, 4)));
+  }
+
+  return copy;
 }
 
 export default function ListsScreen({ navigation }) {
@@ -92,11 +192,17 @@ export default function ListsScreen({ navigation }) {
     updateCustomListName,
     deleteCustomList,
     toggleMovieInCustomList,
+    toggleWatchlist,
+    toggleFavorite,
+    setMovieReaction,
     removeMovieFromWatched,
     getMovieNotes,
+    isWatched,
   } = useMovies();
 
   const [activeTab, setActiveTab] = useState("watchlist");
+  const [viewMode, setViewMode] = useState("grid");
+  const [sortMode, setSortMode] = useState("default");
   const [listName, setListName] = useState("");
   const [listSearch, setListSearch] = useState("");
   const [editingListId, setEditingListId] = useState(null);
@@ -148,71 +254,86 @@ export default function ListsScreen({ navigation }) {
     );
   }
 
-  function renderMovieGrid(data) {
-    if (!data.length) {
-      return <EmptyState title="Lista vazia" description="Abra um filme e adicione ele aqui." />;
+  function renderControls() {
+    return (
+      <View style={{ marginBottom: 14 }}>
+        <Text style={{ color: colors.text, fontWeight: "900", marginBottom: 8 }}>Visualização</Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          <ControlChip label="Grade" active={viewMode === "grid"} onPress={() => setViewMode("grid")} />
+          <ControlChip label="Lista" active={viewMode === "list"} onPress={() => setViewMode("list")} />
+        </ScrollView>
+
+        <Text style={{ color: colors.text, fontWeight: "900", marginTop: 12, marginBottom: 8 }}>Ordenar</Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          {sortOptions.map((option) => (
+            <ControlChip key={option.id} label={option.label} active={sortMode === option.id} onPress={() => setSortMode(option.id)} />
+          ))}
+        </ScrollView>
+      </View>
+    );
+  }
+
+  function renderMovieCollection(data, emptyTitle, emptyDescription, getRemoveAction) {
+    const sorted = sortMovies(data, sortMode, state.watched);
+
+    if (!sorted.length) {
+      return <EmptyState title={emptyTitle} description={emptyDescription} />;
+    }
+
+    if (viewMode === "list") {
+      return sorted.map((movie) => {
+        const removeAction = getRemoveAction?.(movie);
+        return (
+          <MovieListItem
+            key={movie.id}
+            movie={movie}
+            navigation={navigation}
+            watched={isWatched(movie.id)}
+            rating={state.watched?.[movie.id]?.rating || 0}
+            notesCount={getMovieNotes(movie.id).length}
+            onRemove={removeAction?.onPress}
+            removeLabel={removeAction?.label || "Remover"}
+          />
+        );
+      });
     }
 
     return (
-      <FlatList
-        data={data}
-        keyExtractor={(item) => String(item.id)}
-        numColumns={2}
-        scrollEnabled={false}
-        columnWrapperStyle={{ justifyContent: "space-between" }}
-        renderItem={({ item }) => <MovieCard movie={item} navigation={navigation} />}
-      />
+      <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between" }}>
+        {sorted.map((movie) => (
+          <MovieCard key={movie.id} movie={movie} navigation={navigation} />
+        ))}
+      </View>
     );
   }
 
   function renderWatched() {
-    if (!watchedList.length) {
+    const sorted = sortWatchedItems(watchedList, sortMode);
+
+    if (!sorted.length) {
       return <EmptyState title="Nenhum filme assistido" description="Abra um filme e toque em Adicionar em assistidos." />;
     }
 
-    return watchedList.map((item) => (
-      <View
+    return sorted.map((item) => (
+      <MovieListItem
         key={item.movie.id}
-        style={{
-          backgroundColor: colors.surface,
-          borderWidth: 1,
-          borderColor: colors.border,
-          borderRadius: 18,
-          padding: 14,
-          marginBottom: 12,
+        movie={item.movie}
+        navigation={navigation}
+        watched
+        rating={item.rating || 0}
+        notesCount={getMovieNotes(item.movie.id).length}
+        removeLabel="Remover assistido"
+        onRemove={() => {
+          Alert.alert(
+            "Remover de assistidos",
+            "Isso remove o filme apenas da lista de assistidos. As anotações salvas serão mantidas.",
+            [
+              { text: "Cancelar", style: "cancel" },
+              { text: "Remover", style: "destructive", onPress: () => removeMovieFromWatched(item.movie.id) },
+            ]
+          );
         }}
-      >
-        <TouchableOpacity
-          activeOpacity={0.85}
-          onPress={() => navigation.navigate("MovieDetail", { movie: item.movie })}
-        >
-          <Text style={{ color: colors.text, fontWeight: "900", fontSize: 16 }}>{item.movie.title}</Text>
-          <View style={{ marginTop: 8 }}>
-            <RatingStars rating={item.rating || 0} size={24} />
-          </View>
-          <Text style={{ color: colors.muted, marginTop: 8 }}>
-            {getMovieNotes(item.movie.id).length} anotação(ões)
-          </Text>
-        </TouchableOpacity>
-
-        <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 10, marginTop: 12 }}>
-          <SmallButton label="Abrir detalhes" onPress={() => navigation.navigate("MovieDetail", { movie: item.movie })} />
-          <SmallButton
-            label="Remover assistido"
-            danger
-            onPress={() => {
-              Alert.alert(
-                "Remover de assistidos",
-                "Isso remove o filme apenas da lista de assistidos. As anotações salvas serão mantidas.",
-                [
-                  { text: "Cancelar", style: "cancel" },
-                  { text: "Remover", style: "destructive", onPress: () => removeMovieFromWatched(item.movie.id) },
-                ]
-              );
-            }}
-          />
-        </View>
-      </View>
+      />
     ));
   }
 
@@ -272,6 +393,7 @@ export default function ListsScreen({ navigation }) {
         {filteredCustomLists.map((list) => {
           const editingName = editingListId === list.id;
           const editingMovies = editingMoviesListId === list.id;
+          const sortedListMovies = sortMovies(list.movies, sortMode, state.watched);
 
           return (
             <View
@@ -336,18 +458,44 @@ export default function ListsScreen({ navigation }) {
                     />
                   </View>
 
+                  {list.movies.length > 0 && (
+                    <View style={{ marginTop: 12 }}>
+                      <Text style={{ color: colors.text, fontWeight: "900", marginBottom: 8 }}>Ordenar filmes da lista</Text>
+                      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                        {sortOptions.map((option) => (
+                          <ControlChip key={option.id} label={option.label} active={sortMode === option.id} onPress={() => setSortMode(option.id)} />
+                        ))}
+                      </ScrollView>
+                    </View>
+                  )}
+
                   {list.movies.length === 0 && (
                     <Text style={{ color: colors.muted, marginTop: 14 }}>
                       Essa lista ainda não tem filmes. Abra um filme e adicione por lá.
                     </Text>
                   )}
 
-                  {list.movies.length > 0 && !editingMovies && (
+                  {list.movies.length > 0 && !editingMovies && viewMode === "grid" && (
                     <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 14 }}>
-                      {list.movies.map((movie) => (
+                      {sortedListMovies.map((movie) => (
                         <MovieCard key={movie.id} movie={movie} navigation={navigation} horizontal />
                       ))}
                     </ScrollView>
+                  )}
+
+                  {list.movies.length > 0 && !editingMovies && viewMode === "list" && (
+                    <View style={{ marginTop: 12 }}>
+                      {sortedListMovies.map((movie) => (
+                        <MovieListItem
+                          key={movie.id}
+                          movie={movie}
+                          navigation={navigation}
+                          watched={isWatched(movie.id)}
+                          rating={state.watched?.[movie.id]?.rating || 0}
+                          notesCount={getMovieNotes(movie.id).length}
+                        />
+                      ))}
+                    </View>
                   )}
 
                   {list.movies.length > 0 && editingMovies && (
@@ -355,11 +503,15 @@ export default function ListsScreen({ navigation }) {
                       <Text style={{ color: colors.muted, marginTop: 8, marginBottom: 2 }}>
                         Remova apenas os filmes dessa lista. O restante dos dados do filme continua salvo.
                       </Text>
-                      {list.movies.map((movie) => (
+                      {sortedListMovies.map((movie) => (
                         <MovieListItem
                           key={movie.id}
                           movie={movie}
                           navigation={navigation}
+                          watched={isWatched(movie.id)}
+                          rating={state.watched?.[movie.id]?.rating || 0}
+                          notesCount={getMovieNotes(movie.id).length}
+                          removeLabel="Remover da lista"
                           onRemove={() => removeMovieFromCustomList(list, movie)}
                         />
                       ))}
@@ -378,7 +530,7 @@ export default function ListsScreen({ navigation }) {
     <ScrollView style={{ flex: 1, backgroundColor: colors.background }} contentContainerStyle={{ paddingTop: 58, paddingHorizontal: 18, paddingBottom: 150 }}>
       <Text style={{ color: colors.text, fontSize: 30, fontWeight: "900" }}>Minhas listas</Text>
       <Text style={{ color: colors.muted, marginTop: 6 }}>
-        Seus filmes ficam salvos no aparelho, mesmo fechando o app.
+        Organize seus filmes em grade ou lista e ordene por nota, ano ou nome.
       </Text>
 
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 20, marginBottom: 18 }}>
@@ -387,10 +539,12 @@ export default function ListsScreen({ navigation }) {
         ))}
       </ScrollView>
 
-      {activeTab === "watchlist" && renderMovieGrid(state.watchlist)}
-      {activeTab === "favorites" && renderMovieGrid(state.favorites)}
-      {activeTab === "liked" && renderMovieGrid(likedMovies)}
-      {activeTab === "disliked" && renderMovieGrid(dislikedMovies)}
+      {renderControls()}
+
+      {activeTab === "watchlist" && renderMovieCollection(state.watchlist, "Watchlist vazia", "Abra um filme e adicione ele à sua watchlist.", (movie) => ({ label: "Remover da watchlist", onPress: () => toggleWatchlist(movie) }))}
+      {activeTab === "favorites" && renderMovieCollection(state.favorites, "Nenhum favorito", "Toque no coração de um filme para salvar como favorito.", (movie) => ({ label: "Remover favorito", onPress: () => toggleFavorite(movie) }))}
+      {activeTab === "liked" && renderMovieCollection(likedMovies, "Nenhum filme curtido", "Use o botão de like na tela de detalhes.", (movie) => ({ label: "Remover like", onPress: () => setMovieReaction(movie, "like") }))}
+      {activeTab === "disliked" && renderMovieCollection(dislikedMovies, "Nenhum dislike", "Use o botão de dislike na tela de detalhes.", (movie) => ({ label: "Remover dislike", onPress: () => setMovieReaction(movie, "dislike") }))}
       {activeTab === "watched" && renderWatched()}
       {activeTab === "custom" && renderCustomLists()}
     </ScrollView>

@@ -115,7 +115,10 @@ export default function AuthScreen() {
       }
 
       if (isSignup) {
-        Alert.alert("Conta criada", "Sua conta foi criada. Se a confirmação de e-mail estiver desativada no Supabase, você já será conectado automaticamente.");
+        const message = data?.session
+          ? "Sua conta foi criada com sucesso e você já está conectado ao CineMood."
+          : "Sua conta foi criada. Verifique seu e-mail para confirmar antes de entrar. Para testes, você pode desativar a confirmação de e-mail no painel Authentication do Supabase.";
+        Alert.alert("Conta criada", message);
       }
     } finally {
       setBusy(false);

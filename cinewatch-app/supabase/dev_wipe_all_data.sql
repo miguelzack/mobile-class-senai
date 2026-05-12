@@ -6,6 +6,7 @@
 TRUNCATE TABLE
   public.club_private_comments,
   public.club_reviews,
+  public.club_movie_seen,
   public.club_movie_votes,
   public.club_movies,
   public.club_members,

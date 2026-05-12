@@ -18,6 +18,9 @@ import {
   listClubMovies,
   listClubReviews,
   listClubVotes,
+  listClubMovieSeen,
+  markClubMovieSeen,
+  unmarkClubMovieSeen,
   markClubMovieWatched,
   MOVIE_GENRES,
   regenerateClubInviteCode,
@@ -104,7 +107,7 @@ function statusLabel(status) {
   return "Sugestão";
 }
 
-function WeekMovieHero({ selectedMovie, groupAverage, selectedReviews, navigation, onMarkWatched, isAdmin }) {
+function WeekMovieHero({ selectedMovie, groupAverage, selectedReviews, navigation, onMarkWatched, isAdmin, seenCount = 0, memberCount = 0, mySeen = false, onToggleSeen, seenRecords = [] }) {
   const movie = selectedMovie?.movie || {};
   const backdrop = getBackdropUrl(movie.backdrop_path, "w780");
   const poster = getPosterUrl(movie.poster_path, "w342");
@@ -152,10 +155,21 @@ function WeekMovieHero({ selectedMovie, groupAverage, selectedReviews, navigatio
             <Text style={{ color: colors.muted, fontWeight: "800", fontSize: 12 }}>Avaliações</Text>
             <Text style={{ color: colors.text, fontWeight: "900", fontSize: 22, marginTop: 4 }}>{selectedReviews.length}</Text>
           </View>
+          <View style={{ flex: 1, minWidth: 120, backgroundColor: colors.background, borderRadius: 18, padding: 12, borderWidth: 1, borderColor: colors.border }}>
+            <Text style={{ color: colors.muted, fontWeight: "800", fontSize: 12 }}>Já viram</Text>
+            <Text style={{ color: colors.success, fontWeight: "900", fontSize: 22, marginTop: 4 }}>{seenCount}/{memberCount || "--"}</Text>
+          </View>
         </View>
+
+        {isAdmin && seenRecords.length > 0 && (
+          <Text style={{ color: colors.muted, marginTop: 10, lineHeight: 20 }}>
+            Já viram: {seenRecords.map((record) => record.profiles?.full_name || record.profiles?.username || "Membro").join(", ")}
+          </Text>
+        )}
 
         <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 14 }}>
           <SmallButton label="Abrir detalhes" onPress={() => navigation.navigate("MovieDetail", { movie })} />
+          <SmallButton label={mySeen ? "Desmarcar que vi" : "Já vi este filme"} secondary={mySeen} onPress={onToggleSeen} />
           {isAdmin && selectedMovie.status !== "watched" && <SmallButton label="Marcar como assistido" secondary onPress={onMarkWatched} />}
         </View>
       </View>
@@ -259,6 +273,7 @@ export default function ClubDetailScreen({ route, navigation }) {
   const [movies, setMovies] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [votes, setVotes] = useState([]);
+  const [seenRecords, setSeenRecords] = useState([]);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
   const [savingSettings, setSavingSettings] = useState(false);
@@ -278,18 +293,20 @@ export default function ClubDetailScreen({ route, navigation }) {
 
   async function loadClubData() {
     try {
-      const [clubData, memberData, movieData, reviewData, voteData] = await Promise.all([
+      const [clubData, memberData, movieData, reviewData, voteData, seenData] = await Promise.all([
         getClub(clubId),
         listClubMembers(clubId),
         listClubMovies(clubId),
         listClubReviews(clubId),
         listClubVotes(clubId),
+        listClubMovieSeen(clubId),
       ]);
       setClub(clubData);
       setMembers(memberData);
       setMovies(movieData);
       setReviews(reviewData);
       setVotes(voteData);
+      setSeenRecords(seenData);
       setSettingsName(clubData?.name || "");
       setSettingsDescription(clubData?.description || "");
       setSettingsGenres(clubData?.allowed_genres?.length ? clubData.allowed_genres : DEFAULT_ALLOWED_GENRES);
@@ -340,10 +357,21 @@ export default function ClubDetailScreen({ route, navigation }) {
     }, {});
   }, [votes]);
 
+  const seenByMovie = useMemo(() => {
+    return seenRecords.reduce((acc, record) => {
+      const key = record.club_movie_id;
+      acc[key] = acc[key] || [];
+      acc[key].push(record);
+      return acc;
+    }, {});
+  }, [seenRecords]);
+
   const myVote = useMemo(() => votes.find((vote) => vote.user_id === user.id && vote.week_start === activeVoteWeek), [votes, user.id, activeVoteWeek]);
   const selectedReviews = selectedMovie ? reviewsByMovie[selectedMovie.id] || [] : [];
   const myReview = selectedReviews.find((review) => review.user_id === user.id);
   const groupAverage = selectedReviews.length ? selectedReviews.reduce((sum, review) => sum + Number(review.rating || 0), 0) / selectedReviews.length : 0;
+  const selectedSeenRecords = selectedMovie ? seenByMovie[selectedMovie.id] || [] : [];
+  const mySeenSelected = selectedSeenRecords.some((record) => record.user_id === user.id);
 
   const existingMovieByTmdbId = useMemo(() => {
     return movies.reduce((acc, item) => {
@@ -625,9 +653,29 @@ export default function ClubDetailScreen({ route, navigation }) {
     }
   }
 
+  async function handleToggleSeen(item) {
+    if (!item) return;
+
+    try {
+      const currentSeen = (seenByMovie[item.id] || []).some((record) => record.user_id === user.id);
+
+      if (currentSeen) {
+        await unmarkClubMovieSeen({ clubMovieId: item.id, userId: user.id });
+      } else {
+        await markClubMovieSeen({ clubId, clubMovieId: item.id, userId: user.id });
+        saveClubMovieAsPrivateWatched(item);
+      }
+
+      await loadClubData();
+    } catch (error) {
+      Alert.alert("Erro ao atualizar presença", error.message);
+    }
+  }
+
   async function handleMarkWatched(item) {
     try {
       await markClubMovieWatched(item.id);
+      await markClubMovieSeen({ clubId, clubMovieId: item.id, userId: user.id });
       saveClubMovieAsPrivateWatched(item);
       await loadClubData();
       Alert.alert("Filme assistido", "O filme foi marcado como assistido pelo clube e também entrou nos seus assistidos privados.");
@@ -669,6 +717,7 @@ export default function ClubDetailScreen({ route, navigation }) {
     setSavingReview(true);
     try {
       await submitClubReview({ clubId, clubMovieId: selectedMovie.id, userId: user.id, rating: reviewRating, comment: reviewText });
+      await markClubMovieSeen({ clubId, clubMovieId: selectedMovie.id, userId: user.id });
       saveClubReviewPrivately(selectedMovie, reviewRating, personalComment);
       await loadClubData();
       Alert.alert("Avaliação salva", "Sua avaliação foi registrada, o filme entrou nos seus assistidos privados e sua nota também foi salva nas suas estrelas.");
@@ -907,6 +956,11 @@ export default function ClubDetailScreen({ route, navigation }) {
         navigation={navigation}
         isAdmin={isAdmin}
         onMarkWatched={() => selectedMovie && handleMarkWatched(selectedMovie)}
+        seenCount={selectedSeenRecords.length}
+        memberCount={members.length}
+        mySeen={mySeenSelected}
+        onToggleSeen={() => selectedMovie && handleToggleSeen(selectedMovie)}
+        seenRecords={selectedSeenRecords}
       />
 
       <View style={{ backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, borderRadius: 22, padding: 16, marginTop: 16 }}>
@@ -942,7 +996,11 @@ export default function ClubDetailScreen({ route, navigation }) {
         <Text style={{ color: colors.text, fontSize: 20, fontWeight: "900" }}>Avaliação do filme escolhido</Text>
         {selectedMovie ? (
           <>
-            <Text style={{ color: colors.muted, marginTop: 8, lineHeight: 20 }}>Dê sua nota. Ao salvar, esse filme também entra nos seus assistidos privados com a mesma nota. O comentário do grupo aparece para todos; a anotação pessoal fica salva nas anotações do filme.</Text>
+            <Text style={{ color: colors.muted, marginTop: 8, lineHeight: 20 }}>Dê sua nota. Ao salvar, esse filme também entra nos seus assistidos privados com a mesma nota, e o clube registra que você já viu o filme. O comentário do grupo aparece para todos; a anotação pessoal fica salva nas anotações do filme.</Text>
+            <View style={{ backgroundColor: colors.background, borderWidth: 1, borderColor: colors.border, borderRadius: 14, padding: 12, marginTop: 12 }}>
+              <Text style={{ color: colors.text, fontWeight: "900" }}>{mySeenSelected ? "✓ Você marcou que já viu este filme" : "Você ainda não marcou que viu este filme"}</Text>
+              <SmallButton label={mySeenSelected ? "Desmarcar que vi" : "Marcar que já vi"} secondary={mySeenSelected} onPress={() => handleToggleSeen(selectedMovie)} />
+            </View>
             <View style={{ marginTop: 12 }}>
               <RatingStars rating={reviewRating} onChange={setReviewRating} size={34} />
             </View>
@@ -1060,6 +1118,11 @@ export default function ClubDetailScreen({ route, navigation }) {
                 <View style={{ flex: 1 }}>
                   <Text style={{ color: colors.text, fontWeight: "900" }}>{name}</Text>
                   <Text style={{ color: colors.muted, marginTop: 2 }}>{member.role === "owner" ? "ADM criador" : member.role === "admin" ? "ADM" : "Membro"}</Text>
+                  {isAdmin && selectedMovie && (
+                    <Text style={{ color: selectedSeenRecords.some((record) => record.user_id === member.user_id) ? colors.success : colors.muted, marginTop: 2, fontWeight: "800" }}>
+                      {selectedSeenRecords.some((record) => record.user_id === member.user_id) ? "Já viu o filme da semana" : "Ainda não marcou que viu"}
+                    </Text>
+                  )}
                 </View>
               </View>
 

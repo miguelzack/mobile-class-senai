@@ -122,6 +122,17 @@ create table if not exists public.club_movie_votes (
   unique (club_id, user_id, week_start)
 );
 
+create table if not exists public.club_movie_seen (
+  id uuid primary key default gen_random_uuid(),
+  club_id uuid not null references public.movie_clubs(id) on delete cascade,
+  club_movie_id uuid not null references public.club_movies(id) on delete cascade,
+  user_id uuid not null references public.profiles(id) on delete cascade,
+  seen_at timestamptz not null default now(),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  unique (club_movie_id, user_id)
+);
+
 create table if not exists public.club_reviews (
   id uuid primary key default gen_random_uuid(),
   club_id uuid not null references public.movie_clubs(id) on delete cascade,
@@ -150,6 +161,8 @@ create index if not exists club_members_user_id_idx on public.club_members(user_
 create index if not exists club_members_club_id_idx on public.club_members(club_id);
 create index if not exists club_movies_club_week_idx on public.club_movies(club_id, week_start);
 create index if not exists club_movie_votes_movie_idx on public.club_movie_votes(club_movie_id);
+create index if not exists club_movie_seen_movie_idx on public.club_movie_seen(club_movie_id);
+create index if not exists club_movie_seen_user_idx on public.club_movie_seen(user_id, club_movie_id);
 create index if not exists club_reviews_movie_idx on public.club_reviews(club_movie_id);
 create index if not exists club_private_comments_user_idx on public.club_private_comments(user_id, club_movie_id);
 
@@ -172,6 +185,11 @@ for each row execute function public.set_updated_at();
 drop trigger if exists club_movie_votes_set_updated_at on public.club_movie_votes;
 create trigger club_movie_votes_set_updated_at
 before update on public.club_movie_votes
+for each row execute function public.set_updated_at();
+
+drop trigger if exists club_movie_seen_set_updated_at on public.club_movie_seen;
+create trigger club_movie_seen_set_updated_at
+before update on public.club_movie_seen
 for each row execute function public.set_updated_at();
 
 drop trigger if exists club_reviews_set_updated_at on public.club_reviews;
@@ -797,6 +815,7 @@ alter table public.movie_clubs enable row level security;
 alter table public.club_members enable row level security;
 alter table public.club_movies enable row level security;
 alter table public.club_movie_votes enable row level security;
+alter table public.club_movie_seen enable row level security;
 alter table public.club_reviews enable row level security;
 alter table public.club_private_comments enable row level security;
 
@@ -821,6 +840,10 @@ drop policy if exists "Membro vê votos do clube" on public.club_movie_votes;
 drop policy if exists "Membro cria seu voto" on public.club_movie_votes;
 drop policy if exists "Membro atualiza seu voto" on public.club_movie_votes;
 drop policy if exists "Membro apaga seu voto" on public.club_movie_votes;
+drop policy if exists "Membro vê quem já viu" on public.club_movie_seen;
+drop policy if exists "Membro marca que viu" on public.club_movie_seen;
+drop policy if exists "Membro atualiza que viu" on public.club_movie_seen;
+drop policy if exists "Membro desmarca que viu" on public.club_movie_seen;
 drop policy if exists "Membro vê avaliações" on public.club_reviews;
 drop policy if exists "Membro cria sua avaliação" on public.club_reviews;
 drop policy if exists "Membro atualiza sua avaliação" on public.club_reviews;
@@ -942,6 +965,28 @@ with check (user_id = auth.uid() and public.is_club_member(club_id, auth.uid()))
 
 create policy "Membro apaga seu voto"
 on public.club_movie_votes for delete
+to authenticated
+using (user_id = auth.uid());
+
+-- club_movie_seen: cada membro marca/desmarca apenas o próprio status; todos os membros veem a contagem
+create policy "Membro vê quem já viu"
+on public.club_movie_seen for select
+to authenticated
+using (public.is_club_member(club_id, auth.uid()));
+
+create policy "Membro marca que viu"
+on public.club_movie_seen for insert
+to authenticated
+with check (user_id = auth.uid() and public.is_club_member(club_id, auth.uid()));
+
+create policy "Membro atualiza que viu"
+on public.club_movie_seen for update
+to authenticated
+using (user_id = auth.uid())
+with check (user_id = auth.uid() and public.is_club_member(club_id, auth.uid()));
+
+create policy "Membro desmarca que viu"
+on public.club_movie_seen for delete
 to authenticated
 using (user_id = auth.uid());
 

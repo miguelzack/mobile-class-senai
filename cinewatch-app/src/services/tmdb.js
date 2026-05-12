@@ -42,15 +42,26 @@ export async function getPopularMovies(page = 1) {
   return data.results || [];
 }
 
-export async function searchMovies(query) {
-  if (!query?.trim()) return [];
+export async function searchMoviesPage(query, page = 1) {
+  if (!query?.trim()) {
+    return { results: [], page: 1, totalPages: 1 };
+  }
 
   const data = await request("/search/movie", {
     query: query.trim(),
-    page: "1",
+    page: String(page),
   });
 
-  return data.results || [];
+  return {
+    results: data.results || [],
+    page: data.page || page,
+    totalPages: data.total_pages || 1,
+  };
+}
+
+export async function searchMovies(query) {
+  const data = await searchMoviesPage(query, 1);
+  return data.results;
 }
 
 export async function getMovieDetails(movieId) {

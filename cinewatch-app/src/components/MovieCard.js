@@ -2,9 +2,12 @@ import React from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 import { getPosterUrl } from "../services/tmdb";
 import { colors } from "../styles/theme";
+import { useMovies } from "../contexts/MovieContext";
 
 export default function MovieCard({ movie, navigation, horizontal = false, fullWidth = false }) {
   const poster = getPosterUrl(movie.poster_path, "w342");
+  const { isWatched } = useMovies();
+  const watched = isWatched(movie.id);
 
   return (
     <TouchableOpacity
@@ -37,6 +40,24 @@ export default function MovieCard({ movie, navigation, horizontal = false, fullW
           }}
         >
           <Text style={{ color: colors.muted, textAlign: "center" }}>Sem imagem</Text>
+        </View>
+      )}
+
+      {watched && (
+        <View
+          style={{
+            position: "absolute",
+            top: 8,
+            right: 8,
+            backgroundColor: colors.success,
+            borderRadius: 999,
+            paddingHorizontal: 9,
+            paddingVertical: 5,
+            borderWidth: 1,
+            borderColor: "rgba(255,255,255,0.35)",
+          }}
+        >
+          <Text style={{ color: colors.text, fontWeight: "900", fontSize: 11 }}>✓ Já vi</Text>
         </View>
       )}
 

@@ -250,6 +250,54 @@ export async function listClubVotes(clubId) {
   return data || [];
 }
 
+export async function listClubMovieSeen(clubId) {
+  ensureSupabase();
+
+  const { data, error } = await supabase
+    .from("club_movie_seen")
+    .select("*, profiles(username, full_name, avatar_url)")
+    .eq("club_id", clubId)
+    .order("seen_at", { ascending: false });
+
+  if (error) throw error;
+  return data || [];
+}
+
+export async function markClubMovieSeen({ clubId, clubMovieId, userId }) {
+  ensureSupabase();
+
+  const { data, error } = await supabase
+    .from("club_movie_seen")
+    .upsert(
+      {
+        club_id: clubId,
+        club_movie_id: clubMovieId,
+        user_id: userId,
+        seen_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "club_movie_id,user_id" }
+    )
+    .select("*")
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+export async function unmarkClubMovieSeen({ clubMovieId, userId }) {
+  ensureSupabase();
+
+  const { error } = await supabase
+    .from("club_movie_seen")
+    .delete()
+    .eq("club_movie_id", clubMovieId)
+    .eq("user_id", userId);
+
+  if (error) throw error;
+  return true;
+}
+
 export async function listMyClubPersonalComments(clubId) {
   ensureSupabase();
 
