@@ -255,15 +255,33 @@ export default function ListsScreen({ navigation }) {
   }
 
   function renderControls() {
-    return (
-      <View style={{ marginBottom: 14 }}>
-        <Text style={{ color: colors.text, fontWeight: "900", marginBottom: 8 }}>Visualização</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          <ControlChip label="Grade" active={viewMode === "grid"} onPress={() => setViewMode("grid")} />
-          <ControlChip label="Lista" active={viewMode === "list"} onPress={() => setViewMode("list")} />
-        </ScrollView>
+    if (activeTab === "custom") return null;
 
-        <Text style={{ color: colors.text, fontWeight: "900", marginTop: 12, marginBottom: 8 }}>Ordenar</Text>
+    return (
+      <View
+        style={{
+          backgroundColor: colors.surface,
+          borderWidth: 1,
+          borderColor: colors.border,
+          borderRadius: 22,
+          padding: 14,
+          marginBottom: 16,
+        }}
+      >
+        <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
+          <View style={{ flex: 1 }}>
+            <Text style={{ color: colors.text, fontWeight: "900", fontSize: 16 }}>Como mostrar</Text>
+            <Text style={{ color: colors.muted, marginTop: 3, fontSize: 12 }}>Troque entre grade e lista sem perder a ordenação.</Text>
+          </View>
+          <View style={{ flexDirection: "row", gap: 8 }}>
+            <ControlChip label="Grade" active={viewMode === "grid"} onPress={() => setViewMode("grid")} />
+            <ControlChip label="Lista" active={viewMode === "list"} onPress={() => setViewMode("list")} />
+          </View>
+        </View>
+
+        <View style={{ height: 1, backgroundColor: colors.border, marginVertical: 14 }} />
+
+        <Text style={{ color: colors.text, fontWeight: "900", marginBottom: 8 }}>Ordenar filmes</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           {sortOptions.map((option) => (
             <ControlChip key={option.id} label={option.label} active={sortMode === option.id} onPress={() => setSortMode(option.id)} />
@@ -314,6 +332,16 @@ export default function ListsScreen({ navigation }) {
       return <EmptyState title="Nenhum filme assistido" description="Abra um filme e toque em Adicionar em assistidos." />;
     }
 
+    if (viewMode === "grid") {
+      return (
+        <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between" }}>
+          {sorted.map((item) => (
+            <MovieCard key={item.movie.id} movie={item.movie} navigation={navigation} />
+          ))}
+        </View>
+      );
+    }
+
     return sorted.map((item) => (
       <MovieListItem
         key={item.movie.id}
@@ -337,10 +365,24 @@ export default function ListsScreen({ navigation }) {
     ));
   }
 
-  function renderCustomLists() {
+  function renderCustomListControls() {
     return (
-      <View>
-        <View style={{ flexDirection: "row", gap: 10, marginBottom: 12 }}>
+      <View
+        style={{
+          backgroundColor: colors.surface,
+          borderWidth: 1,
+          borderColor: colors.border,
+          borderRadius: 24,
+          padding: 16,
+          marginBottom: 16,
+        }}
+      >
+        <Text style={{ color: colors.text, fontSize: 20, fontWeight: "900" }}>Gerenciar listas</Text>
+        <Text style={{ color: colors.muted, marginTop: 5, lineHeight: 20 }}>
+          Crie, pesquise, ordene e escolha como os filmes aparecem dentro das suas listas.
+        </Text>
+
+        <View style={{ flexDirection: "row", gap: 10, marginTop: 14 }}>
           <TextInput
             value={listName}
             onChangeText={setListName}
@@ -348,18 +390,19 @@ export default function ListsScreen({ navigation }) {
             placeholderTextColor={colors.muted}
             style={{
               flex: 1,
-              backgroundColor: colors.surface,
+              backgroundColor: colors.background,
               color: colors.text,
               borderWidth: 1,
               borderColor: colors.border,
-              borderRadius: 14,
+              borderRadius: 16,
               paddingHorizontal: 14,
               paddingVertical: 12,
             }}
           />
           <TouchableOpacity
+            activeOpacity={0.85}
             onPress={handleCreateList}
-            style={{ backgroundColor: colors.primary, paddingHorizontal: 16, justifyContent: "center", borderRadius: 14 }}
+            style={{ backgroundColor: colors.primary, paddingHorizontal: 18, justifyContent: "center", borderRadius: 16 }}
           >
             <Text style={{ color: colors.text, fontWeight: "900" }}>Criar</Text>
           </TouchableOpacity>
@@ -371,16 +414,39 @@ export default function ListsScreen({ navigation }) {
           placeholder="Pesquisar lista pelo nome"
           placeholderTextColor={colors.muted}
           style={{
-            backgroundColor: colors.surface,
+            backgroundColor: colors.background,
             color: colors.text,
             borderWidth: 1,
             borderColor: colors.border,
-            borderRadius: 14,
+            borderRadius: 16,
             paddingHorizontal: 14,
             paddingVertical: 12,
-            marginBottom: 18,
+            marginTop: 12,
           }}
         />
+
+        <View style={{ height: 1, backgroundColor: colors.border, marginVertical: 16 }} />
+
+        <Text style={{ color: colors.text, fontWeight: "900", marginBottom: 8 }}>Visualização dos filmes</Text>
+        <View style={{ flexDirection: "row", gap: 8, marginBottom: 14 }}>
+          <ControlChip label="Grade" active={viewMode === "grid"} onPress={() => setViewMode("grid")} />
+          <ControlChip label="Lista" active={viewMode === "list"} onPress={() => setViewMode("list")} />
+        </View>
+
+        <Text style={{ color: colors.text, fontWeight: "900", marginBottom: 8 }}>Ordenar filmes das listas</Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          {sortOptions.map((option) => (
+            <ControlChip key={option.id} label={option.label} active={sortMode === option.id} onPress={() => setSortMode(option.id)} />
+          ))}
+        </ScrollView>
+      </View>
+    );
+  }
+
+  function renderCustomLists() {
+    return (
+      <View>
+        {renderCustomListControls()}
 
         {!state.customLists.length && (
           <EmptyState title="Nenhuma lista personalizada" description="Crie listas como Terror, Filmes com amigos ou Top 10." />
@@ -401,15 +467,15 @@ export default function ListsScreen({ navigation }) {
               style={{
                 backgroundColor: colors.surface,
                 borderWidth: 1,
-                borderColor: colors.border,
-                borderRadius: 18,
-                padding: 14,
-                marginBottom: 14,
+                borderColor: editingMovies ? colors.primary : colors.border,
+                borderRadius: 24,
+                padding: 16,
+                marginBottom: 16,
               }}
             >
               {editingName ? (
                 <View>
-                  <Text style={{ color: colors.text, fontWeight: "900", marginBottom: 8 }}>Editar nome da lista</Text>
+                  <Text style={{ color: colors.text, fontWeight: "900", fontSize: 18 }}>Editar nome da lista</Text>
                   <TextInput
                     value={editingListName}
                     onChangeText={setEditingListName}
@@ -420,27 +486,35 @@ export default function ListsScreen({ navigation }) {
                       color: colors.text,
                       borderWidth: 1,
                       borderColor: colors.border,
-                      borderRadius: 14,
+                      borderRadius: 16,
                       paddingHorizontal: 14,
                       paddingVertical: 12,
+                      marginTop: 12,
                     }}
                   />
                   <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 10, marginTop: 12 }}>
                     <SmallButton label="Salvar" primary onPress={saveEditList} />
-                    <SmallButton label="Cancelar" onPress={cancelEditList} />
+                    <SmallButton label="Cancelar" secondary onPress={cancelEditList} />
                   </View>
                 </View>
               ) : (
                 <>
-                  <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start", gap: 10 }}>
+                  <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start", gap: 12 }}>
                     <View style={{ flex: 1 }}>
-                      <Text style={{ color: colors.text, fontWeight: "900", fontSize: 18 }}>{list.name}</Text>
-                      <Text style={{ color: colors.muted, marginTop: 6 }}>{list.movies.length} filme(s)</Text>
+                      <Text style={{ color: colors.text, fontWeight: "900", fontSize: 21 }}>{list.name}</Text>
+                      <Text style={{ color: colors.muted, marginTop: 5 }}>
+                        {list.movies.length} filme(s) • {viewMode === "grid" ? "modo grade" : "modo lista"}
+                      </Text>
                     </View>
+                    {editingMovies && (
+                      <View style={{ backgroundColor: colors.primary, borderRadius: 999, paddingHorizontal: 10, paddingVertical: 6 }}>
+                        <Text style={{ color: colors.text, fontWeight: "900", fontSize: 11 }}>Editando</Text>
+                      </View>
+                    )}
                   </View>
 
-                  <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 12 }}>
-                    <SmallButton label="Editar nome" onPress={() => startEditList(list)} />
+                  <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 14 }}>
+                    <SmallButton label="Editar nome" secondary onPress={() => startEditList(list)} />
                     <SmallButton
                       label={editingMovies ? "Concluir edição" : "Editar filmes"}
                       primary={editingMovies}
@@ -458,29 +532,20 @@ export default function ListsScreen({ navigation }) {
                     />
                   </View>
 
-                  {list.movies.length > 0 && (
-                    <View style={{ marginTop: 12 }}>
-                      <Text style={{ color: colors.text, fontWeight: "900", marginBottom: 8 }}>Ordenar filmes da lista</Text>
-                      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                        {sortOptions.map((option) => (
-                          <ControlChip key={option.id} label={option.label} active={sortMode === option.id} onPress={() => setSortMode(option.id)} />
-                        ))}
-                      </ScrollView>
+                  {list.movies.length === 0 && (
+                    <View style={{ backgroundColor: colors.background, borderRadius: 18, padding: 14, marginTop: 14, borderWidth: 1, borderColor: colors.border }}>
+                      <Text style={{ color: colors.muted, lineHeight: 20 }}>
+                        Essa lista ainda não tem filmes. Abra um filme e adicione por lá.
+                      </Text>
                     </View>
                   )}
 
-                  {list.movies.length === 0 && (
-                    <Text style={{ color: colors.muted, marginTop: 14 }}>
-                      Essa lista ainda não tem filmes. Abra um filme e adicione por lá.
-                    </Text>
-                  )}
-
                   {list.movies.length > 0 && !editingMovies && viewMode === "grid" && (
-                    <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 14 }}>
+                    <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between", marginTop: 14 }}>
                       {sortedListMovies.map((movie) => (
-                        <MovieCard key={movie.id} movie={movie} navigation={navigation} horizontal />
+                        <MovieCard key={movie.id} movie={movie} navigation={navigation} />
                       ))}
-                    </ScrollView>
+                    </View>
                   )}
 
                   {list.movies.length > 0 && !editingMovies && viewMode === "list" && (
@@ -499,10 +564,13 @@ export default function ListsScreen({ navigation }) {
                   )}
 
                   {list.movies.length > 0 && editingMovies && (
-                    <View style={{ marginTop: 6 }}>
-                      <Text style={{ color: colors.muted, marginTop: 8, marginBottom: 2 }}>
-                        Remova apenas os filmes dessa lista. O restante dos dados do filme continua salvo.
-                      </Text>
+                    <View style={{ marginTop: 12 }}>
+                      <View style={{ backgroundColor: colors.background, borderRadius: 18, padding: 14, borderWidth: 1, borderColor: colors.border, marginBottom: 12 }}>
+                        <Text style={{ color: colors.text, fontWeight: "900" }}>Modo edição de filmes</Text>
+                        <Text style={{ color: colors.muted, marginTop: 5, lineHeight: 20 }}>
+                          Remova apenas os filmes dessa lista. O restante dos dados do filme continua salvo.
+                        </Text>
+                      </View>
                       {sortedListMovies.map((movie) => (
                         <MovieListItem
                           key={movie.id}

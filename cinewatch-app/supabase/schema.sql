@@ -27,6 +27,8 @@ create table if not exists public.profiles (
   bio text,
   avatar_url text,
   avatar_path text,
+  favorite_genres integer[] not null default '{}'::integer[],
+  streaming_platforms text[] not null default '{}'::text[],
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -54,6 +56,13 @@ drop trigger if exists profiles_set_updated_at on public.profiles;
 create trigger profiles_set_updated_at
 before update on public.profiles
 for each row execute function public.set_updated_at();
+
+-- Preferências do usuário para recomendações e estatísticas de perfil
+alter table public.profiles
+  add column if not exists favorite_genres integer[] not null default '{}'::integer[];
+
+alter table public.profiles
+  add column if not exists streaming_platforms text[] not null default '{}'::text[];
 
 -- =========================
 -- Backup dos dados pessoais do app

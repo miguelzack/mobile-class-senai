@@ -6,6 +6,12 @@ import { initialMovieState, loadMovieState, mergeMovieStates, saveMovieState } f
 const MovieContext = createContext(null);
 
 function normalizeMovie(movie) {
+  const genreIds = Array.isArray(movie.genre_ids)
+    ? movie.genre_ids
+    : Array.isArray(movie.genres)
+      ? movie.genres.map((genre) => genre.id).filter(Boolean)
+      : [];
+
   return {
     id: movie.id,
     title: movie.title || movie.name || "Filme sem título",
@@ -14,7 +20,8 @@ function normalizeMovie(movie) {
     vote_average: movie.vote_average || 0,
     release_date: movie.release_date || "",
     overview: movie.overview || "",
-    genre_ids: movie.genre_ids || [],
+    genre_ids: genreIds,
+    runtime: movie.runtime || null,
   };
 }
 

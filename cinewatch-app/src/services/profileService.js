@@ -23,6 +23,12 @@ export async function updateMyProfile(userId, values) {
     username: values.username?.trim() || "usuário",
     full_name: values.full_name?.trim() || null,
     bio: values.bio?.trim() || null,
+    favorite_genres: Array.isArray(values.favorite_genres)
+      ? values.favorite_genres.map((id) => Number(id)).filter(Boolean)
+      : [],
+    streaming_platforms: Array.isArray(values.streaming_platforms)
+      ? values.streaming_platforms.filter(Boolean)
+      : [],
     updated_at: new Date().toISOString(),
   };
 
