@@ -26,6 +26,12 @@
     },
     "web": {
       "bundler": "metro"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "329bd99d-732f-4850-84da-48f3f024caa3"
+      }
+    },
+    "owner": "miguelzack"
   }
 }
