@@ -1,0 +1,31 @@
+{
+  "expo": {
+    "name": "SENAI Cursos",
+    "slug": "senai-cursos",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/senai-logo-horizontal.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#E30613"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#E30613"
+      },
+      "package": "com.senai.cursos"
+    },
+    "web": {
+      "bundler": "metro"
+    }
+  }
+}

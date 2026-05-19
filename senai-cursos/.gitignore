@@ -1,0 +1,9 @@
+node_modules/
+.expo/
+dist/
+build/
+*.log
+npm-debug.*
+.DS_Store
+.env
+.idea
