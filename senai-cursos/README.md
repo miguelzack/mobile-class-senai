@@ -69,9 +69,8 @@ O resultado esperado é um aplicativo mobile funcional, organizado e visualmente
 
 ## Link do repositório
 
-> Substituir o link abaixo pelo endereço real do projeto no GitHub após publicar o repositório.
 
-[Repositório do projeto no GitHub](COLE_AQUI_O_LINK_DO_REPOSITORIO)
+[https://github.com/miguelzack/senai-cursos-app](COLE_AQUI_O_LINK_DO_REPOSITORIO)
 
 ---
 
