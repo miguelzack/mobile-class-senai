@@ -141,7 +141,7 @@ export default function HomeScreen() {
     return (
       <SafeAreaView style={styles.centered}>
         <ActivityIndicator size="large" color={colors.primary} />
-        <Text style={styles.loadingText}>Preparando banco SQLite...</Text>
+        <Text style={styles.loadingText}>Preparando banco...</Text>
       </SafeAreaView>
     );
   }

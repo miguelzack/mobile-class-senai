@@ -30,7 +30,7 @@ export default function ContactScreen() {
 
       Alert.alert(
         'Mensagem registrada',
-        'Sua mensagem foi salva no banco SQLite do aplicativo.'
+        'Sua mensagem foi enviada.'
       );
 
       setName('');
@@ -68,7 +68,7 @@ export default function ContactScreen() {
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
         <Header
           title="Contato e atendimento"
-          subtitle="Fale com a escola, envie uma mensagem ou registre seu interesse no SQLite."
+          subtitle="Fale com a escola, envie uma mensagem ou registre seu interesse."
         />
 
         <Card mode="elevated" style={styles.card}>
@@ -118,7 +118,7 @@ export default function ContactScreen() {
               style={styles.button}
               contentStyle={styles.buttonContent}
             >
-              Salvar no SQLite
+              Enviar
             </Button>
 
             <View style={styles.buttonGrid}>

@@ -374,14 +374,26 @@ Apresentar informações institucionais da escola, professores, atendimento e di
 
 ┌─────────────────────────────────────┐
 │ Professores dos cursos              │
-│ Prof. Fiama                         │
-│ Descrição formal...                 │
+│ Toque em um professor para detalhes │
 │                                     │
-│ Prof. Atila                         │
-│ Descrição formal...                 │
+│ ┌─────────────────────────────────┐ │
+│ │ FI  Prof. Fiama          >      │ │
+│ │ Docente de Back-end, Lógica...  │ │
+│ │ [Java] [Lógica] [Projetos]      │ │
+│ │ Toque para descrição completa   │ │
+│ └─────────────────────────────────┘ │
 │                                     │
-│ Prof. Lucas                         │
-│ Descrição formal...                 │
+│ ┌─────────────────────────────────┐ │
+│ │ AT  Prof. Atila          >      │ │
+│ │ Docente de Front, Mobile...     │ │
+│ │ [Front-end] [Mobile] [Banco]    │ │
+│ └─────────────────────────────────┘ │
+│                                     │
+│ ┌─────────────────────────────────┐ │
+│ │ LU  Prof. Lucas          >      │ │
+│ │ Docente de Front, Mobile...     │ │
+│ │ [Front-end] [Mobile] [Projetos] │ │
+│ └─────────────────────────────────┘ │
 └─────────────────────────────────────┘
 
 ┌─────────────────────────────────────┐
@@ -539,11 +551,34 @@ WhatsApp: (11) 5642-3407
 
 ### Professores
 
-| Professor | Áreas de atuação |
-|---|---|
-| Prof. Fiama | Back-end com Java, lógica de programação e projetos integradores. |
-| Prof. Atila | Front-end, mobile, banco de dados e lógica de programação. |
-| Prof. Lucas | Front-end, mobile, lógica de programação e projetos. |
+| Professor | Áreas de atuação | Interação no protótipo |
+|---|---|---|
+| Prof. Fiama | Back-end com Java, lógica de programação e projetos integradores. | Abre modal com descrição completa. |
+| Prof. Atila | Front-end, mobile, banco de dados e lógica de programação. | Abre modal com descrição completa. |
+| Prof. Lucas | Front-end, mobile, lógica de programação e projetos. | Abre modal com descrição completa. |
+
+### Modal de descrição do professor
+
+Quando o usuário toca em um card de professor, o app abre uma modal com informações completas da atuação docente.
+
+```txt
+┌─────────────────────────────────────┐
+│ FI  Prof. Fiama                     │
+│ Docente de Back-end, Lógica...      │
+├─────────────────────────────────────┤
+│ Descrição completa                  │
+│ Texto formal explicando a atuação,  │
+│ unidades curriculares e objetivos.  │
+│                                     │
+│ Áreas de atuação                    │
+│ [Back-end em Java] [Lógica]         │
+│ [Projetos integradores]             │
+│                                     │
+│ [ Entendi ]                         │
+└─────────────────────────────────────┘
+```
+
+Essa decisão de design evita que textos longos fiquem expostos diretamente na tela da escola. Assim, a tela principal permanece limpa e o usuário acessa os detalhes somente quando desejar.
 
 ---
 
