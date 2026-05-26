@@ -1,20 +1,13 @@
-import {styled} from "styled-components/native";
-import {Home} from "./src/pages/home";
-import {SafeAreaView} from "react-native-safe-area-context";
-import {StatusBar} from "expo-status-bar";
+import { StatusBar } from 'expo-status-bar';
+import { Home } from "./src/pages/home/index"
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-
-const Status = styled.StatusBar``
-const Title = styled.Text`
-font-size: 30px;
-`
 
 export default function App() {
   return (
-    <SafeAreaView style={{flex: 1}}>
-      <StatusBar hidden/>
-      <Home/>
+    <SafeAreaView style={{flex: 1}} >
+      <StatusBar hidden />
+      <Home />
     </SafeAreaView>
   );
 }
-

@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "doctor-appoinment",
-    "slug": "doctor-appoinment",
+    "name": "doctor-appointment",
+    "slug": "doctor-appointment",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./src/assets/icon.png",
