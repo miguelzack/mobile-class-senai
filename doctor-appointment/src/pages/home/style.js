@@ -1,9 +1,11 @@
 import styled from "styled-components/native";
 
 export const Container = styled.View`
+    width: 100%;
+    height: 100%;
     flex: 1;
-    border: 1px solid red;
     display: flex;
+    flex-direction: column;
     padding: 64px 24px;
     background-color: "#FFFFFF";
 `
